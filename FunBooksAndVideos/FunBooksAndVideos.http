@@ -1,0 +1,6 @@
+@FunBooksAndVideos_HostAddress = http://localhost:5225
+
+GET {{FunBooksAndVideos_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
