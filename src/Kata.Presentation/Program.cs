@@ -1,9 +1,6 @@
-using Kata.DataAccess;
-using Kata.DataAccess.Interfaces;
-using Kata.DataAccess.Repositories;
+using Kata.BusinessLogic;
 using Kata.Presentation.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -44,13 +41,7 @@ if (string.IsNullOrEmpty(connectionString))
     connectionString = "Server=.;Database=FunBooksAndVideos;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 }
 
-builder.Services.AddScoped(provider => new SqlDataAccess(connectionString));
-
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<IVideoRepository, VideoRepository>();
-builder.Services.AddScoped<IMembershipProductRepository, MembershipProductRepository>();
-builder.Services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
+builder.Services.RegisterBusinessLogicRepositories(connectionString);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

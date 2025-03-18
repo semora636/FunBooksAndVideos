@@ -26,19 +26,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{27
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{C95A9FFF-1022-47E4-A546-112E402FB257}"
 	ProjectSection(SolutionItems) = preProject
-		database\data\SeedInitialData.sql = database\data\SeedInitialData.sql
+		database\data\20250318_000_SeedInitialData.sql = database\data\20250318_000_SeedInitialData.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schema", "schema", "{11FBF130-1E2D-4693-BC73-A7D1B72AADF3}"
 	ProjectSection(SolutionItems) = preProject
-		database\schema\000_Database.sql = database\schema\000_Database.sql
-		database\schema\001_Customers.sql = database\schema\001_Customers.sql
-		database\schema\002_Books.sql = database\schema\002_Books.sql
-		database\schema\003_Videos.sql = database\schema\003_Videos.sql
-		database\schema\004_MembershipProducts.sql = database\schema\004_MembershipProducts.sql
-		database\schema\005_PurchaseOrders.sql = database\schema\005_PurchaseOrders.sql
-		database\schema\006_OrderItems.sql = database\schema\006_OrderItems.sql
-		database\schema\007_Memberships.sql = database\schema\007_Memberships.sql
+		database\schema\20250318_000_Database.sql = database\schema\20250318_000_Database.sql
+		database\schema\20250318_001_Customers.sql = database\schema\20250318_001_Customers.sql
+		database\schema\20250318_002_Books.sql = database\schema\20250318_002_Books.sql
+		database\schema\20250318_007_Memberships.sql = database\schema\20250318_007_Memberships.sql
+		database\schema\20250318_003_Videos.sql = database\schema\20250318_003_Videos.sql
+		database\schema\20250318_004_MembershipProducts.sql = database\schema\20250318_004_MembershipProducts.sql
+		database\schema\20250318_005_PurchaseOrders.sql = database\schema\20250318_005_PurchaseOrders.sql
+		database\schema\20250318_006_OrderItems.sql = database\schema\20250318_006_OrderItems.sql
 	EndProjectSection
 EndProject
 Global

@@ -1,4 +1,4 @@
-﻿using Kata.DataAccess.Interfaces;
+﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +8,12 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly IBookRepository _bookRepository;
+        private readonly IBookService _bookService;
         private readonly ILogger<BookController> _logger;
 
-        public BookController(IBookRepository bookRepository, ILogger<BookController> logger)
+        public BookController(IBookService bookService, ILogger<BookController> logger)
         {
-            _bookRepository = bookRepository;
+            _bookService = bookService;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var books = _bookRepository.GetAllBooks();
+                var books = _bookService.GetAllBooks();
                 return Ok(books);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var book = _bookRepository.GetBookById(id);
+                var book = _bookService.GetBookById(id);
 
                 if (book == null)
                 {
@@ -58,7 +58,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _bookRepository.AddBook(book);
+                _bookService.AddBook(book);
                 return CreatedAtAction(nameof(GetBookById), new { id = book.BookId }, book);
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace Kata.Presentation.Controllers
                     return BadRequest("BookId in the request body must match the id in the URL.");
                 }
 
-                _bookRepository.UpdateBook(book);
+                _bookService.UpdateBook(book);
                 return NoContent();
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _bookRepository.DeleteBook(id);
+                _bookService.DeleteBook(id);
                 return NoContent();
             }
             catch (Exception ex)

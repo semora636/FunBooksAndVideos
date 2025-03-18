@@ -1,4 +1,4 @@
-﻿using Kata.DataAccess.Interfaces;
+﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +8,12 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class PurchaseOrderController : ControllerBase
     {
-        private readonly IPurchaseOrderRepository _purchaseOrderRepository;
+        private readonly IPurchaseOrderService _purchaseOrderService;
         private readonly ILogger<PurchaseOrderController> _logger;
 
-        public PurchaseOrderController(IPurchaseOrderRepository purchaseOrderRepository, ILogger<PurchaseOrderController> logger)
+        public PurchaseOrderController(IPurchaseOrderService purchaseOrderService, ILogger<PurchaseOrderController> logger)
         {
-            _purchaseOrderRepository = purchaseOrderRepository;
+            _purchaseOrderService = purchaseOrderService;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var purchaseOrders = _purchaseOrderRepository.GetAllPurchaseOrders();
+                var purchaseOrders = _purchaseOrderService.GetAllPurchaseOrders();
                 return Ok(purchaseOrders);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var purchaseOrder = _purchaseOrderRepository.GetPurchaseOrderById(id);
+                var purchaseOrder = _purchaseOrderService.GetPurchaseOrderById(id);
 
                 if (purchaseOrder == null)
                 {
@@ -58,7 +58,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _purchaseOrderRepository.AddPurchaseOrder(purchaseOrder);
+                _purchaseOrderService.AddPurchaseOrder(purchaseOrder);
                 return CreatedAtAction(nameof(GetPurchaseOrderById), new { id = purchaseOrder.PurchaseOrderId }, purchaseOrder);
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace Kata.Presentation.Controllers
                     return BadRequest("PurchaseOrderId in the request body must match the ID in the URL.");
                 }
 
-                _purchaseOrderRepository.UpdatePurchaseOrder(purchaseOrder);
+                _purchaseOrderService.UpdatePurchaseOrder(purchaseOrder);
                 return NoContent();
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _purchaseOrderRepository.DeletePurchaseOrder(id);
+                _purchaseOrderService.DeletePurchaseOrder(id);
                 return NoContent();
             }
             catch (Exception ex)

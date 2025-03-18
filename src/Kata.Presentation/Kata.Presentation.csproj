@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kata.DataAccess\Kata.DataAccess.csproj" />
+    <ProjectReference Include="..\Kata.BusinessLogic\Kata.BusinessLogic.csproj" />
+    <ProjectReference Include="..\Kata.Domain\Kata.Domain.csproj" />
   </ItemGroup>
 
 </Project>

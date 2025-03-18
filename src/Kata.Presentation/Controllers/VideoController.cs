@@ -1,4 +1,4 @@
-﻿using Kata.DataAccess.Interfaces;
+﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +8,12 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class VideoController : ControllerBase
     {
-        private readonly IVideoRepository _videoRepository;
+        private readonly IVideoService _videoService;
         private readonly ILogger<VideoController> _logger;
 
-        public VideoController(IVideoRepository videoRepository, ILogger<VideoController> logger)
+        public VideoController(IVideoService videoService, ILogger<VideoController> logger)
         {
-            _videoRepository = videoRepository;
+            _videoService = videoService;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var video = _videoRepository.GetAllVideos();
+                var video = _videoService.GetAllVideos();
                 return Ok(video);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var video = _videoRepository.GetVideoById(id);
+                var video = _videoService.GetVideoById(id);
 
                 if (video == null)
                 {
@@ -58,7 +58,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _videoRepository.AddVideo(video);
+                _videoService.AddVideo(video);
                 return CreatedAtAction(nameof(GetVideoById), new { id = video.VideoId }, video);
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace Kata.Presentation.Controllers
                     return BadRequest("VideoId in the request body must match the id in the URL.");
                 }
 
-                _videoRepository.UpdateVideo(video);
+                _videoService.UpdateVideo(video);
                 return NoContent();
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _videoRepository.DeleteVideo(id);
+                _videoService.DeleteVideo(id);
                 return NoContent();
             }
             catch (Exception ex)

@@ -1,4 +1,4 @@
-﻿using Kata.DataAccess.Interfaces;
+﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +8,12 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class MembershipProductController : ControllerBase
     {
-        private readonly IMembershipProductRepository _membershipProductRepository;
+        private readonly IMembershipProductService _membershipProductService;
         private readonly ILogger<MembershipProductController> _logger;
 
-        public MembershipProductController(IMembershipProductRepository membershipProductRepository, ILogger<MembershipProductController> logger)
+        public MembershipProductController(IMembershipProductService membershipProductService, ILogger<MembershipProductController> logger)
         {
-            _membershipProductRepository = membershipProductRepository;
+            _membershipProductService = membershipProductService;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var membershipProducts = _membershipProductRepository.GetAllMembershipProducts();
+                var membershipProducts = _membershipProductService.GetAllMembershipProducts();
                 return Ok(membershipProducts);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var membershipProduct = _membershipProductRepository.GetMembershipProductById(id);
+                var membershipProduct = _membershipProductService.GetMembershipProductById(id);
 
                 if (membershipProduct == null)
                 {
@@ -58,7 +58,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _membershipProductRepository.AddMembershipProduct(membershipProduct);
+                _membershipProductService.AddMembershipProduct(membershipProduct);
                 return CreatedAtAction(nameof(GetMembershipProductById), new { id = membershipProduct.MembershipProductId }, membershipProduct);
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace Kata.Presentation.Controllers
                     return BadRequest("MembershipProductId in the request body must match the id in the URL.");
                 }
 
-                _membershipProductRepository.UpdateMembershipProduct(membershipProduct);
+                _membershipProductService.UpdateMembershipProduct(membershipProduct);
                 return NoContent();
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _membershipProductRepository.DeleteMembershipProduct(id);
+                _membershipProductService.DeleteMembershipProduct(id);
                 return NoContent();
             }
             catch (Exception ex)

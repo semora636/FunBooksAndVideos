@@ -1,4 +1,4 @@
-﻿using Kata.DataAccess.Interfaces;
+﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +8,12 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly ICustomerRepository _customerRepository;
+        private readonly ICustomerService _customerService;
         private readonly ILogger<CustomerController> _logger;
 
-        public CustomerController(ICustomerRepository customerRepository, ILogger<CustomerController> logger)
+        public CustomerController(ICustomerService customerService, ILogger<CustomerController> logger)
         {
-            _customerRepository = customerRepository;
+            _customerService = customerService;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var customers = _customerRepository.GetAllCustomers();
+                var customers = _customerService.GetAllCustomers();
                 return Ok(customers);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                var customer = _customerRepository.GetCustomerById(id);
+                var customer = _customerService.GetCustomerById(id);
 
                 if (customer == null)
                 {
@@ -58,7 +58,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _customerRepository.AddCustomer(customer);
+                _customerService.AddCustomer(customer);
                 return CreatedAtAction(nameof(GetCustomerById), new { id = customer.CustomerId }, customer);
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace Kata.Presentation.Controllers
                     return BadRequest("CustomerId in the request body must match the ID in the URL.");
                 }
 
-                _customerRepository.UpdateCustomer(customer);
+                _customerService.UpdateCustomer(customer);
                 return NoContent();
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace Kata.Presentation.Controllers
         {
             try
             {
-                _customerRepository.DeleteCustomer(id);
+                _customerService.DeleteCustomer(id);
                 return NoContent();
             }
             catch (Exception ex)
