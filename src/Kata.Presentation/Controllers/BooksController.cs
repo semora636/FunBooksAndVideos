@@ -52,5 +52,55 @@ namespace Kata.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
+        [HttpPost]
+        public ActionResult<Book> AddBook([FromBody] Book book)
+        {
+            try
+            {
+                _bookRepository.AddBook(book);
+                return CreatedAtAction(nameof(GetBookById), new { id = book.BookId }, book);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding a new book.");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(int id, [FromBody] Book book)
+        {
+            try
+            {
+                if (id != book.BookId)
+                {
+                    return BadRequest("BookId in the request body must match the id in the URL.");
+                }
+
+                _bookRepository.UpdateBook(book);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating book with ID {id}.");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBook(int id)
+        {
+            try
+            {
+                _bookRepository.DeleteBook(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting book with ID {id}.");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
     }
 }

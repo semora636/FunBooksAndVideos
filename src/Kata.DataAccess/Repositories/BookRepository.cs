@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
+using System.Net;
 
 namespace Kata.DataAccess.Repositories
 {
@@ -23,6 +24,24 @@ namespace Kata.DataAccess.Repositories
         {
             using var connection = _dataAccess.CreateConnection();
             return connection.Query<Book>("SELECT * FROM Books");
+        }
+
+        public void AddBook(Book book)
+        {
+            using var connection = _dataAccess.CreateConnection();
+            connection.Execute("INSERT INTO Books (Name, Price, Author) VALUES (@Name, @Price, @Author)", book);
+        }
+
+        public void UpdateBook(Book book)
+        {
+            using var connection = _dataAccess.CreateConnection();
+            connection.Execute("UPDATE Books SET Name = @Name, Price = @Price, Author = @Author WHERE BookId = @BookId", new { book.BookId });
+        }
+
+        public void DeleteBook(int bookId)
+        {
+            using var connection = _dataAccess.CreateConnection();
+            connection.Execute("DELETE FROM Books WHERE BookId = @BookId", new { BookId = bookId });
         }
     }
 }
