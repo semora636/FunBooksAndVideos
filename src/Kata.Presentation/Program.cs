@@ -1,3 +1,6 @@
+using Kata.DataAccess;
+using Kata.DataAccess.Interfaces;
+using Kata.DataAccess.Repositories;
 using Kata.Presentation.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
@@ -33,6 +36,17 @@ builder.Services.AddAuthentication(option =>
 });
 
 builder.Services.AddAuthorization();
+
+string? connectionString = builder.Configuration.GetConnectionString("KataConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = "Server=.;Database=FunBooksAndVideos;Trusted_Connection=True;MultipleActiveResultSets=true";
+}
+
+builder.Services.AddScoped<SqlDataAccess>(provider => new SqlDataAccess(connectionString));
+
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
