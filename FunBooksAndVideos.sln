@@ -34,11 +34,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schema", "schema", "{11FBF1
 		database\schema\20250318_000_Database.sql = database\schema\20250318_000_Database.sql
 		database\schema\20250318_001_Customers.sql = database\schema\20250318_001_Customers.sql
 		database\schema\20250318_002_Books.sql = database\schema\20250318_002_Books.sql
-		database\schema\20250318_007_Memberships.sql = database\schema\20250318_007_Memberships.sql
 		database\schema\20250318_003_Videos.sql = database\schema\20250318_003_Videos.sql
 		database\schema\20250318_004_MembershipProducts.sql = database\schema\20250318_004_MembershipProducts.sql
 		database\schema\20250318_005_PurchaseOrders.sql = database\schema\20250318_005_PurchaseOrders.sql
 		database\schema\20250318_006_OrderItems.sql = database\schema\20250318_006_OrderItems.sql
+		database\schema\20250318_007_Memberships.sql = database\schema\20250318_007_Memberships.sql
+		database\schema\20250318_008_ShippingSlips.sql = database\schema\20250318_008_ShippingSlips.sql
 	EndProjectSection
 EndProject
 Global

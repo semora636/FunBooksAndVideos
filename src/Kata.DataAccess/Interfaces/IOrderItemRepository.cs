@@ -7,6 +7,6 @@ namespace Kata.DataAccess.Interfaces
     {
         int AddOrderItem(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection);
         void DeleteOrderItemsByPurchaseOrderId(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
-        List<OrderItem> GetOrderItemsByPurchaseOrderId(int purchaseOrderId);
+        IEnumerable<OrderItem> GetOrderItemsByPurchaseOrderId(int purchaseOrderId);
     }
 }

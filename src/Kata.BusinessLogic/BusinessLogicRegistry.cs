@@ -26,7 +26,8 @@ namespace Kata.BusinessLogic
             services.AddScoped<IMembershipProductRepository, MembershipProductRepository>();
             services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
             services.AddScoped<IOrderItemRepository, OrderItemRepository>();
-            services.AddScoped<IMembershipRepository, MembershipRepository>();            
+            services.AddScoped<IMembershipRepository, MembershipRepository>();
+            services.AddScoped<IShippingSlipRepository, ShippingSlipRepository>();
 
             return services;
         }

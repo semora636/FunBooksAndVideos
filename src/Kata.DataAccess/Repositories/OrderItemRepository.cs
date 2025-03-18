@@ -24,7 +24,7 @@ namespace Kata.DataAccess.Repositories
             connection.Execute("DELETE FROM OrderItems WHERE PurchaseOrderId = @PurchaseOrderId", new { PurchaseOrderId = purchaseOrderId }, transaction);
         }
 
-        public List<OrderItem> GetOrderItemsByPurchaseOrderId(int purchaseOrderId)
+        public IEnumerable<OrderItem> GetOrderItemsByPurchaseOrderId(int purchaseOrderId)
         {
             using var connection = _dataAccess.CreateConnection();
             return connection.Query<OrderItem>("SELECT * FROM OrderItems WHERE PurchaseOrderId = @PurchaseOrderId", new { PurchaseOrderId = purchaseOrderId }).ToList();
