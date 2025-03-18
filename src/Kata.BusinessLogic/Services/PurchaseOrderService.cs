@@ -2,6 +2,7 @@
 using Kata.DataAccess;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
+using Microsoft.Data.SqlClient;
 
 namespace Kata.BusinessLogic.Services
 {
@@ -9,13 +10,17 @@ namespace Kata.BusinessLogic.Services
     {
         private readonly IPurchaseOrderRepository _purchaseOrderRepository;
         private readonly IOrderItemRepository _orderItemRepository;
+        private readonly IMembershipRepository _membershipRepository;
+        private readonly IMembershipProductRepository _membershipProductRepository;
         private readonly SqlDataAccess _dataAccess;
 
-        public PurchaseOrderService(IPurchaseOrderRepository purchaseOrderRepository, IOrderItemRepository orderItemRepository, SqlDataAccess dataAccess)
+        public PurchaseOrderService(SqlDataAccess dataAccess, IPurchaseOrderRepository purchaseOrderRepository, IOrderItemRepository orderItemRepository, IMembershipRepository membershipRepository, IMembershipProductRepository membershipProductRepository)
         {
+            _dataAccess = dataAccess;
             _purchaseOrderRepository = purchaseOrderRepository;
             _orderItemRepository = orderItemRepository;
-            _dataAccess = dataAccess;
+            _membershipRepository = membershipRepository;
+            _membershipProductRepository = membershipProductRepository;
         }
 
         public PurchaseOrder? GetPurchaseOrderById(int purchaseOrderId)
@@ -50,14 +55,26 @@ namespace Kata.BusinessLogic.Services
 
             try
             {
-                purchaseOrder.PurchaseOrderId = _purchaseOrderRepository.AddPurchaseOrder(purchaseOrder, transaction, connection);
-
                 if (purchaseOrder.Items != null)
                 {
+                    purchaseOrder.OrderDateTime = DateTime.UtcNow;
+                    purchaseOrder.TotalPrice = purchaseOrder.Items.Sum(item => item.Price * item.Quantity);
+                    purchaseOrder.PurchaseOrderId = _purchaseOrderRepository.AddPurchaseOrder(purchaseOrder, transaction, connection);
+
                     foreach (var item in purchaseOrder.Items)
                     {
                         item.PurchaseOrderId = purchaseOrder.PurchaseOrderId;
                         item.OrderItemId = _orderItemRepository.AddOrderItem(item, transaction, connection);
+
+                        if (item.ProductType == Domain.Enums.ProductType.Membership)
+                        {
+                            // If the item is a membership product, we need to add it to Membership table
+                            ActivateMembership(purchaseOrder, connection, transaction, item);
+                        }
+                        else if (item.ProductType == Domain.Enums.ProductType.Book)
+                        {
+                            // If the item is a phisical product, so we need to generate a shipping slip
+                        }
                     }
                 }
                 transaction.Commit();
@@ -127,6 +144,24 @@ namespace Kata.BusinessLogic.Services
             finally
             {
                 connection.Close();
+            }
+        }
+
+        private void ActivateMembership(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction, OrderItem item)
+        {
+            // TODO: We can check if the user already has an active memvbership and in this case just increase the
+            // existing expiration, or add the duration on top of the existing one
+            var membershipProduct = _membershipProductRepository.GetMembershipProductById(item.ProductId);
+            if (membershipProduct != null)
+            {
+                var membership = new Membership()
+                {
+                    ActivationDateTime = DateTime.UtcNow,
+                    ExpirationDateTime = DateTime.UtcNow.AddMonths(membershipProduct.DurationMonths),
+                    CustomerId = purchaseOrder.CustomerId,
+                    MembershipType = membershipProduct.MembershipType
+                };
+                _membershipRepository.AddMembership(membership, transaction, connection);
             }
         }
     }

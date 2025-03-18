@@ -8,13 +8,15 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly ICustomerService _customerService;
         private readonly ILogger<CustomerController> _logger;
+        private readonly ICustomerService _customerService;
+        private readonly IMembershipService _membershipService;
 
-        public CustomerController(ICustomerService customerService, ILogger<CustomerController> logger)
+        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService, IMembershipService membershipService)
         {
-            _customerService = customerService;
             _logger = logger;
+            _customerService = customerService;
+            _membershipService = membershipService;
         }
 
         [HttpGet]
@@ -49,6 +51,21 @@ namespace Kata.Presentation.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error retrieving customer with ID {id}.");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpGet("{id}/memberships")]
+        public ActionResult<IEnumerable<PurchaseOrder>> GetMembershipsByCustomerId(int id)
+        {
+            try
+            {
+                var memberships = _membershipService.GetMembershipsByCustomerId(id);
+                return Ok(memberships);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all purchase orders.");
                 return StatusCode(500, "Internal Server Error");
             }
         }
