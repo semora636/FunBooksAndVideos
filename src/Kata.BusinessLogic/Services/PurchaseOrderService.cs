@@ -2,6 +2,7 @@
 using Kata.DataAccess;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
+using Microsoft.Data.SqlClient;
 
 namespace Kata.BusinessLogic.Services
 {
@@ -33,8 +34,8 @@ namespace Kata.BusinessLogic.Services
 
             if (purchaseOrder != null)
             {
-                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrderId);
-                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrderId);
+                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrderId).ToList();
+                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrderId).ToList();
             }
 
             return purchaseOrder;
@@ -46,8 +47,8 @@ namespace Kata.BusinessLogic.Services
 
             foreach (var purchaseOrder in purchaseOrders)
             {
-                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId);
-                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrder.PurchaseOrderId);
+                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId).ToList();
+                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrder.PurchaseOrderId).ToList();
             }
 
             return purchaseOrders;
@@ -55,17 +56,14 @@ namespace Kata.BusinessLogic.Services
 
         public void AddPurchaseOrder(PurchaseOrder purchaseOrder)
         {
-            using var connection = _dataAccess.CreateConnection();
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-
-            try
+            ExecuteTransaction((transaction, connection) =>
             {
                 if (purchaseOrder.Items != null)
                 {
                     purchaseOrder.OrderDateTime = DateTime.UtcNow;
                     purchaseOrder.TotalPrice = purchaseOrder.Items.Sum(item => item.Price * item.Quantity);
                     purchaseOrder.PurchaseOrderId = _purchaseOrderRepository.AddPurchaseOrder(purchaseOrder, transaction, connection);
+                    purchaseOrder.ShippingSlips = new List<ShippingSlip>();
 
                     foreach (var item in purchaseOrder.Items)
                     {
@@ -84,26 +82,12 @@ namespace Kata.BusinessLogic.Services
                         }
                     }
                 }
-                transaction.Commit();
-            }
-            catch (Exception)
-            {
-                transaction.Rollback();
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
+            });
         }
 
         public void UpdatePurchaseOrder(PurchaseOrder purchaseOrder)
         {
-            using var connection = _dataAccess.CreateConnection();
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-
-            try
+            ExecuteTransaction((transaction, connection) =>
             {
                 _purchaseOrderRepository.UpdatePurchaseOrder(purchaseOrder, transaction, connection);
                 _orderItemService.DeleteOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId, transaction, connection);
@@ -116,21 +100,20 @@ namespace Kata.BusinessLogic.Services
                         item.OrderItemId = _orderItemService.AddOrderItem(item, transaction, connection);
                     }
                 }
-
-                transaction.Commit();
-            }
-            catch (Exception)
-            {
-                transaction.Rollback();
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
+            });
         }
 
         public void DeletePurchaseOrder(int purchaseOrderId)
+        {
+            ExecuteTransaction((transaction, connection) =>
+            {
+                _orderItemService.DeleteOrderItemsByPurchaseOrderId(purchaseOrderId, transaction, connection);
+                _purchaseOrderRepository.DeletePurchaseOrder(purchaseOrderId, transaction, connection);
+
+            });
+        }
+
+        private void ExecuteTransaction(Action<SqlTransaction, SqlConnection> operation)
         {
             using var connection = _dataAccess.CreateConnection();
             connection.Open();
@@ -138,9 +121,7 @@ namespace Kata.BusinessLogic.Services
 
             try
             {
-                _orderItemService.DeleteOrderItemsByPurchaseOrderId(purchaseOrderId, transaction, connection);
-                _purchaseOrderRepository.DeletePurchaseOrder(purchaseOrderId, transaction, connection);
-
+                operation(transaction, connection);
                 transaction.Commit();
             }
             catch (Exception)

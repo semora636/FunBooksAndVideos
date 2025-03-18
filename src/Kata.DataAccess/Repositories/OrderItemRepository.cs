@@ -16,7 +16,7 @@ namespace Kata.DataAccess.Repositories
 
         public int AddOrderItem(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection)
         {
-            return connection.ExecuteScalar<int>("INSERT INTO OrderItems (PurchaseOrderId, ProductId, ProductType, Quantity, Price) VALUES (@PurchaseOrderId, @ProductId, @ProductType, @Quantity, @Price)", orderItem, transaction);
+            return connection.ExecuteScalar<int>("INSERT INTO OrderItems (PurchaseOrderId, ProductId, ProductType, Quantity, Price) VALUES (@PurchaseOrderId, @ProductId, @ProductType, @Quantity, @Price); SELECT SCOPE_IDENTITY();", orderItem, transaction);
         }
 
         public void DeleteOrderItemsByPurchaseOrderId(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection)

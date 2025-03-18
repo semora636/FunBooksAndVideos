@@ -32,6 +32,12 @@ namespace Kata.BusinessLogic.Services
                     RecipientAddress = customer.Address,
                 };
                 _shippingSlipRepository.AddShippingSlip(shippingSlip, transaction, connection);
+
+                if (purchaseOrder.ShippingSlips == null)
+                {
+                    purchaseOrder.ShippingSlips = [];
+                }
+                purchaseOrder.ShippingSlips.Add(shippingSlip);
             }
         }
     }

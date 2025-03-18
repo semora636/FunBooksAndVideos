@@ -6,7 +6,7 @@
         public int CustomerId { get; set; }
         public DateTime OrderDateTime { get; set; }
         public decimal TotalPrice { get; set; }
-        public IEnumerable<OrderItem>? Items { get; set; }
-        public IEnumerable<ShippingSlip>? ShippingSlips { get; set; }
+        public IList<OrderItem>? Items { get; set; }
+        public IList<ShippingSlip>? ShippingSlips { get; set; }
     }
 }
