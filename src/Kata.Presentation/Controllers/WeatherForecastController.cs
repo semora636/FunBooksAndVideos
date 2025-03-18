@@ -4,7 +4,7 @@ using Microsoft.Identity.Web.Resource;
 
 namespace FunBooksAndVideos.Controllers
 {
-    
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     [RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
