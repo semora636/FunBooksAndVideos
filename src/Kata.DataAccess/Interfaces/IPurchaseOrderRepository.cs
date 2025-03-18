@@ -1,4 +1,5 @@
 ﻿using Kata.Domain.Entities;
+using Microsoft.Data.SqlClient;
 
 namespace Kata.DataAccess.Interfaces
 {
@@ -6,8 +7,8 @@ namespace Kata.DataAccess.Interfaces
     {
         PurchaseOrder? GetPurchaseOrderById(int purchaseOrderId);
         IEnumerable<PurchaseOrder> GetAllPurchaseOrders();
-        void AddPurchaseOrder(PurchaseOrder purchaseOrder);
-        void UpdatePurchaseOrder(PurchaseOrder purchaseOrder);
-        void DeletePurchaseOrder(int purchaseOrderId);
+        int AddPurchaseOrder(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
+        void UpdatePurchaseOrder(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
+        void DeletePurchaseOrder(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
     }
 }
