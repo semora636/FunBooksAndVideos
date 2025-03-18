@@ -2,36 +2,29 @@
 using Kata.DataAccess;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
 
 namespace Kata.BusinessLogic.Services
 {
     public class PurchaseOrderService : IPurchaseOrderService
     {
         private readonly IPurchaseOrderRepository _purchaseOrderRepository;
-        private readonly IOrderItemRepository _orderItemRepository;
-        private readonly IMembershipRepository _membershipRepository;
-        private readonly IMembershipProductRepository _membershipProductRepository;
-        private readonly IShippingSlipRepository _shippingSlipRepository;
-        private readonly ICustomerRepository _customerRepository;
+        private readonly IOrderItemService _orderItemService;
+        private readonly IMembershipService _membershipService;
+        private readonly IShippingSlipService _shippingSlipService;
         private readonly SqlDataAccess _dataAccess;
 
         public PurchaseOrderService(
             SqlDataAccess dataAccess,
             IPurchaseOrderRepository purchaseOrderRepository,
-            IOrderItemRepository orderItemRepository,
-            IMembershipRepository membershipRepository,
-            IMembershipProductRepository membershipProductRepository,
-            IShippingSlipRepository shippingSlipRepository,
-            ICustomerRepository customerRepository)
+            IOrderItemService orderItemService,
+            IMembershipService membershipService,
+            IShippingSlipService shippingSlipService)
         {
             _dataAccess = dataAccess;
             _purchaseOrderRepository = purchaseOrderRepository;
-            _orderItemRepository = orderItemRepository;
-            _membershipRepository = membershipRepository;
-            _membershipProductRepository = membershipProductRepository;
-            _shippingSlipRepository = shippingSlipRepository;
-            _customerRepository = customerRepository;
+            _orderItemService = orderItemService;
+            _membershipService = membershipService;
+            _shippingSlipService = shippingSlipService;
         }
 
         public PurchaseOrder? GetPurchaseOrderById(int purchaseOrderId)
@@ -40,8 +33,8 @@ namespace Kata.BusinessLogic.Services
 
             if (purchaseOrder != null)
             {
-                purchaseOrder.Items = _orderItemRepository.GetOrderItemsByPurchaseOrderId(purchaseOrderId);
-                purchaseOrder.ShippingSlips = _shippingSlipRepository.GetShippingSlipsByPurchaseOrderId(purchaseOrderId);
+                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrderId);
+                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrderId);
             }
 
             return purchaseOrder;
@@ -53,8 +46,8 @@ namespace Kata.BusinessLogic.Services
 
             foreach (var purchaseOrder in purchaseOrders)
             {
-                purchaseOrder.Items = _orderItemRepository.GetOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId);
-                purchaseOrder.ShippingSlips = _shippingSlipRepository.GetShippingSlipsByPurchaseOrderId(purchaseOrder.PurchaseOrderId);
+                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId);
+                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrder.PurchaseOrderId);
             }
 
             return purchaseOrders;
@@ -77,17 +70,17 @@ namespace Kata.BusinessLogic.Services
                     foreach (var item in purchaseOrder.Items)
                     {
                         item.PurchaseOrderId = purchaseOrder.PurchaseOrderId;
-                        item.OrderItemId = _orderItemRepository.AddOrderItem(item, transaction, connection);
+                        item.OrderItemId = _orderItemService.AddOrderItem(item, transaction, connection);
 
                         if (item.ProductType == Domain.Enums.ProductType.Membership)
                         {
                             // If the item is a membership product, we need to add it to Membership table
-                            ActivateMembership(purchaseOrder, connection, transaction, item);
+                            _membershipService.ActivateMembership(purchaseOrder, connection, transaction, item);
                         }
                         else if (item.ProductType == Domain.Enums.ProductType.Book)
                         {
                             // If the item is a phisical product, so we need to generate a shipping slip
-                            GenerateShippingSlip(purchaseOrder, connection, transaction);
+                            _shippingSlipService.GenerateShippingSlip(purchaseOrder, connection, transaction);
                         }
                     }
                 }
@@ -113,14 +106,14 @@ namespace Kata.BusinessLogic.Services
             try
             {
                 _purchaseOrderRepository.UpdatePurchaseOrder(purchaseOrder, transaction, connection);
-                _orderItemRepository.DeleteOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId, transaction, connection);
+                _orderItemService.DeleteOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId, transaction, connection);
 
                 if (purchaseOrder.Items != null)
                 {
                     foreach (var item in purchaseOrder.Items)
                     {
                         item.PurchaseOrderId = purchaseOrder.PurchaseOrderId;
-                        item.OrderItemId = _orderItemRepository.AddOrderItem(item, transaction, connection);
+                        item.OrderItemId = _orderItemService.AddOrderItem(item, transaction, connection);
                     }
                 }
 
@@ -145,7 +138,7 @@ namespace Kata.BusinessLogic.Services
 
             try
             {
-                _orderItemRepository.DeleteOrderItemsByPurchaseOrderId(purchaseOrderId, transaction, connection);
+                _orderItemService.DeleteOrderItemsByPurchaseOrderId(purchaseOrderId, transaction, connection);
                 _purchaseOrderRepository.DeletePurchaseOrder(purchaseOrderId, transaction, connection);
 
                 transaction.Commit();
@@ -158,38 +151,6 @@ namespace Kata.BusinessLogic.Services
             finally
             {
                 connection.Close();
-            }
-        }
-
-        private void ActivateMembership(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction, OrderItem item)
-        {
-            // TODO: We can check if the user already has an active memvbership and in this case just increase the
-            // existing expiration, or add the duration on top of the existing one
-            var membershipProduct = _membershipProductRepository.GetMembershipProductById(item.ProductId);
-            if (membershipProduct != null)
-            {
-                var membership = new Membership()
-                {
-                    ActivationDateTime = DateTime.UtcNow,
-                    ExpirationDateTime = DateTime.UtcNow.AddMonths(membershipProduct.DurationMonths),
-                    CustomerId = purchaseOrder.CustomerId,
-                    MembershipType = membershipProduct.MembershipType
-                };
-                _membershipRepository.AddMembership(membership, transaction, connection);
-            }
-        }
-
-        private void GenerateShippingSlip(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction)
-        {
-            var customer = _customerRepository.GetCustomerById(purchaseOrder.CustomerId);
-            if (customer != null)
-            {
-                var shippingSlip = new ShippingSlip()
-                {
-                    PurchaseOrderId = purchaseOrder.PurchaseOrderId,
-                    RecipientAddress = customer.Address,
-                };
-                _shippingSlipRepository.AddShippingSlip(shippingSlip, transaction, connection);
             }
         }
     }
