@@ -28,7 +28,7 @@ namespace Kata.DataAccess.Repositories
         public void AddVideo(Video video)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("INSERT INTO Videos (Name, Price, Director) VALUES (@Name, @Price, @Director)", video);
+            video.VideoId = connection.Execute("INSERT INTO Videos (Name, Price, Director) VALUES (@Name, @Price, @Director); SELECT SCOPE_IDENTITY();", video);
         }
 
         public void UpdateVideo(Video video)

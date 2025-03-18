@@ -28,7 +28,7 @@ namespace Kata.DataAccess.Repositories
         public void AddBook(Book book)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("INSERT INTO Books (Name, Price, Author) VALUES (@Name, @Price, @Author)", book);
+            book.BookId = connection.ExecuteScalar<int>("INSERT INTO Books (Name, Price, Author) VALUES (@Name, @Price, @Author); SELECT SCOPE_IDENTITY();", book);
         }
 
         public void UpdateBook(Book book)

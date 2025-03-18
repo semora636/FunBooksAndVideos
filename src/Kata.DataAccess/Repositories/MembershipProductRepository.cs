@@ -28,7 +28,7 @@ namespace Kata.DataAccess.Repositories
         public void AddMembershipProduct(MembershipProduct membershipProduct)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("INSERT INTO MembershipProducts (Name, MembershipType, Price, DurationMonths) VALUES (@Name, @MembershipType, @Price, @DurationMonths)", membershipProduct);
+            membershipProduct.MembershipProductId = connection.ExecuteScalar<int>("INSERT INTO MembershipProducts (Name, MembershipType, Price, DurationMonths) VALUES (@Name, @MembershipType, @Price, @DurationMonths); SELECT SCOPE_IDENTITY();", membershipProduct);
         }
 
         public void UpdateMembershipProduct(MembershipProduct membershipProduct)
