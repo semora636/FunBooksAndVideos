@@ -6,12 +6,12 @@ namespace Kata.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BooksController : ControllerBase
+    public class BookController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
-        private readonly ILogger<BooksController> _logger;
+        private readonly ILogger<BookController> _logger;
 
-        public BooksController(IBookRepository bookRepository, ILogger<BooksController> logger)
+        public BookController(IBookRepository bookRepository, ILogger<BookController> logger)
         {
             _bookRepository = bookRepository;
             _logger = logger;

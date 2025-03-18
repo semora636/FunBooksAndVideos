@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using System.Net;
 
 namespace Kata.DataAccess.Repositories
 {

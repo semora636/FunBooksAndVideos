@@ -6,7 +6,7 @@ namespace Kata.Domain.Entities
     { 
         public int MembershipProductId { get; set; }
         public required string Name { get; set; }
-        public MembershipType Type { get; set; }
+        public MembershipType MembershipType { get; set; }
         public decimal Price { get; set; }
         public int DurationMonths { get; set; }
 
