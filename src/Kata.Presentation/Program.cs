@@ -41,12 +41,13 @@ string? connectionString = builder.Configuration.GetConnectionString("KataConnec
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    connectionString = "Server=.;Database=FunBooksAndVideos;Trusted_Connection=True;MultipleActiveResultSets=true";
+    connectionString = "Server=.;Database=FunBooksAndVideos;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 }
 
-builder.Services.AddScoped<SqlDataAccess>(provider => new SqlDataAccess(connectionString));
+builder.Services.AddScoped(provider => new SqlDataAccess(connectionString));
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IVideoRepository, VideoRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

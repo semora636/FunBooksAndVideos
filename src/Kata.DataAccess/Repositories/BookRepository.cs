@@ -35,7 +35,7 @@ namespace Kata.DataAccess.Repositories
         public void UpdateBook(Book book)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("UPDATE Books SET Name = @Name, Price = @Price, Author = @Author WHERE BookId = @BookId", new { book.BookId });
+            connection.Execute("UPDATE Books SET Name = @Name, Price = @Price, Author = @Author WHERE BookId = @BookId", book);
         }
 
         public void DeleteBook(int bookId)
