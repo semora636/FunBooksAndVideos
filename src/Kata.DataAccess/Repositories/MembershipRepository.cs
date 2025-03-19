@@ -1,15 +1,15 @@
 ﻿using Dapper;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.DataAccess.Repositories
 {
     public class MembershipRepository : IMembershipRepository
     {
-        private readonly SqlDataAccess _dataAccess;
+        private readonly ISqlDataAccess _dataAccess;
 
-        public MembershipRepository(SqlDataAccess dataAccess)
+        public MembershipRepository(ISqlDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }
@@ -20,7 +20,7 @@ namespace Kata.DataAccess.Repositories
             return await connection.QueryAsync<Membership>("SELECT * FROM Memberships WHERE CustomerId = @CustomerId", new { CustomerId = customerId });
         }
 
-        public async Task AddMembershipAsync(Membership membership, SqlTransaction transaction, SqlConnection connection)
+        public async Task AddMembershipAsync(Membership membership, IDbTransaction transaction, IDbConnection connection)
         {
             membership.MembershipId = await connection.ExecuteScalarAsync<int>("INSERT INTO Memberships (MembershipType, ActivationDateTime, ExpirationDateTime, CustomerId) VALUES (@MembershipType, @ActivationDateTime, @ExpirationDateTime, @CustomerId); SELECT SCOPE_IDENTITY();", membership, transaction);
         }

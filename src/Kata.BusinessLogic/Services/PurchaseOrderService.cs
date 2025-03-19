@@ -2,7 +2,7 @@
 using Kata.DataAccess;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.BusinessLogic.Services
 {
@@ -12,10 +12,10 @@ namespace Kata.BusinessLogic.Services
         private readonly IOrderItemService _orderItemService;
         private readonly IMembershipService _membershipService;
         private readonly IShippingSlipService _shippingSlipService;
-        private readonly SqlDataAccess _dataAccess;
+        private readonly ISqlDataAccess _dataAccess;
 
         public PurchaseOrderService(
-            SqlDataAccess dataAccess,
+            ISqlDataAccess dataAccess,
             IPurchaseOrderRepository purchaseOrderRepository,
             IOrderItemService orderItemService,
             IMembershipService membershipService,
@@ -115,10 +115,10 @@ namespace Kata.BusinessLogic.Services
             });
         }
 
-        private async Task ExecuteTransactionAsync(Func<SqlTransaction, SqlConnection, Task> operation)
+        private async Task ExecuteTransactionAsync(Func<IDbTransaction, IDbConnection, Task> operation)
         {
             using var connection = _dataAccess.CreateConnection();
-            await connection.OpenAsync();
+            connection.Open();
             using var transaction = connection.BeginTransaction();
 
             try

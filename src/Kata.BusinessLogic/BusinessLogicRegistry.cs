@@ -11,7 +11,7 @@ namespace Kata.BusinessLogic
     {
         public static IServiceCollection RegisterBusinessLogicRepositories(this IServiceCollection services, string connectionString)
         {
-            services.AddScoped(provider => new SqlDataAccess(connectionString));
+            services.AddScoped<ISqlDataAccess>(provider => new SqlDataAccess(connectionString));
 
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IBookService, BookService>();

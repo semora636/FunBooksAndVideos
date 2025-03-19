@@ -6,9 +6,9 @@ namespace Kata.DataAccess.Repositories
 {
     public class VideoRepository : IVideoRepository
     {
-        private readonly SqlDataAccess _dataAccess;
+        private readonly ISqlDataAccess _dataAccess;
 
-        public VideoRepository(SqlDataAccess dataAccess)
+        public VideoRepository(ISqlDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }

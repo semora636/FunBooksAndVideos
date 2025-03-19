@@ -1,12 +1,12 @@
 ﻿using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.DataAccess.Interfaces
 {
     public interface IOrderItemRepository
     {
-        Task<int> AddOrderItemAsync(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection);
-        Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
+        Task<int> AddOrderItemAsync(OrderItem orderItem, IDbTransaction transaction, IDbConnection connection);
+        Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, IDbTransaction transaction, IDbConnection connection);
         Task<IEnumerable<OrderItem>> GetOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId);
     }
 }

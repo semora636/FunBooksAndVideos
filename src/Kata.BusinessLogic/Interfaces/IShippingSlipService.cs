@@ -1,11 +1,11 @@
 ﻿using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.BusinessLogic.Interfaces
 {
     public interface IShippingSlipService
     {
         Task<IEnumerable<ShippingSlip>> GetShippingSlipsByPurchaseOrderIdAsync(int purchaseOrderId);
-        Task GenerateShippingSlipAsync(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction);
+        Task GenerateShippingSlipAsync(PurchaseOrder purchaseOrder, IDbConnection connection, IDbTransaction transaction);
     }
 }

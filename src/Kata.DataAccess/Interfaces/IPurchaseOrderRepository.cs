@@ -1,5 +1,5 @@
 ﻿using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.DataAccess.Interfaces
 {
@@ -7,8 +7,8 @@ namespace Kata.DataAccess.Interfaces
     {
         Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId);
         Task<IEnumerable<PurchaseOrder>> GetAllPurchaseOrdersAsync();
-        Task<int> AddPurchaseOrderAsync(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
-        Task UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
-        Task DeletePurchaseOrderAsync(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
+        Task<int> AddPurchaseOrderAsync(PurchaseOrder purchaseOrder, IDbTransaction transaction, IDbConnection connection);
+        Task UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder, IDbTransaction transaction, IDbConnection connection);
+        Task DeletePurchaseOrderAsync(int purchaseOrderId, IDbTransaction transaction, IDbConnection connection);
     }
 }

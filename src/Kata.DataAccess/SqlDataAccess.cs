@@ -1,8 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.DataAccess
 {
-    public class SqlDataAccess
+    public class SqlDataAccess : ISqlDataAccess
     {
         private readonly string _connectionString;
 
@@ -11,7 +12,7 @@ namespace Kata.DataAccess
             _connectionString = connectionString;
         }
 
-        public SqlConnection CreateConnection()
+        public IDbConnection CreateConnection()
         {
             return new SqlConnection(_connectionString);
         }

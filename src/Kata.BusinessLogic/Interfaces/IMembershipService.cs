@@ -1,11 +1,11 @@
 ﻿using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.BusinessLogic.Interfaces
 {
     public interface IMembershipService
     {
         Task<IEnumerable<Membership>> GetMembershipsByCustomerIdAsync(int customerId);
-        Task ActivateMembershipAsync(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction, OrderItem item);
+        Task ActivateMembershipAsync(PurchaseOrder purchaseOrder, IDbConnection connection, IDbTransaction transaction, OrderItem item);
     }
 }

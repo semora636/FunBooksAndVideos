@@ -6,9 +6,9 @@ namespace Kata.DataAccess.Repositories
 {
     public class BookRepository : IBookRepository
     {
-        private readonly SqlDataAccess _dataAccess;
+        private readonly ISqlDataAccess _dataAccess;
 
-        public BookRepository(SqlDataAccess dataAccess)
+        public BookRepository(ISqlDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }

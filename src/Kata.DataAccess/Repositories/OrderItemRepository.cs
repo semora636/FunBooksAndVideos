@@ -1,25 +1,25 @@
 ﻿using Dapper;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.DataAccess.Repositories
 {
     public class OrderItemRepository : IOrderItemRepository
     {
-        private readonly SqlDataAccess _dataAccess;
+        private readonly ISqlDataAccess _dataAccess;
 
-        public OrderItemRepository(SqlDataAccess dataAccess)
+        public OrderItemRepository(ISqlDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }
 
-        public async Task<int> AddOrderItemAsync(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection)
+        public async Task<int> AddOrderItemAsync(OrderItem orderItem, IDbTransaction transaction, IDbConnection connection)
         {
             return await connection.ExecuteScalarAsync<int>("INSERT INTO OrderItems (PurchaseOrderId, ProductId, ProductType, Quantity, Price) VALUES (@PurchaseOrderId, @ProductId, @ProductType, @Quantity, @Price); SELECT SCOPE_IDENTITY();", orderItem, transaction);
         }
 
-        public async Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection)
+        public async Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, IDbTransaction transaction, IDbConnection connection)
         {
             await connection.ExecuteAsync("DELETE FROM OrderItems WHERE PurchaseOrderId = @PurchaseOrderId", new { PurchaseOrderId = purchaseOrderId }, transaction);
         }

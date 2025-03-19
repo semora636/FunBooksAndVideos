@@ -6,9 +6,9 @@ namespace Kata.DataAccess.Repositories
 {
     public class MembershipProductRepository : IMembershipProductRepository
     {
-        private readonly SqlDataAccess _dataAccess;
+        private readonly ISqlDataAccess _dataAccess;
 
-        public MembershipProductRepository(SqlDataAccess dataAccess)
+        public MembershipProductRepository(ISqlDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }

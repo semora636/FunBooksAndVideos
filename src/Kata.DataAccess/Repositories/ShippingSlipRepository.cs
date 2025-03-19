@@ -1,15 +1,15 @@
 ﻿using Dapper;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.DataAccess.Repositories
 {
     public class ShippingSlipRepository : IShippingSlipRepository
     {
-        private readonly SqlDataAccess _dataAccess;
+        private readonly ISqlDataAccess _dataAccess;
 
-        public ShippingSlipRepository(SqlDataAccess dataAccess)
+        public ShippingSlipRepository(ISqlDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }
@@ -20,7 +20,7 @@ namespace Kata.DataAccess.Repositories
             return await connection.QueryAsync<ShippingSlip>("SELECT * FROM ShippingSlips WHERE PurchaseOrderId = @PurchaseOrderId", new { PurchaseOrderId = purchaseOrderId });
         }
 
-        public async Task AddShippingSlipAsync(ShippingSlip shippingSlip, SqlTransaction transaction, SqlConnection connection)
+        public async Task AddShippingSlipAsync(ShippingSlip shippingSlip, IDbTransaction transaction, IDbConnection connection)
         {
             shippingSlip.ShippingSlipId = await connection.ExecuteScalarAsync<int>("INSERT INTO ShippingSlips (PurchaseOrderId, RecipientAddress) VALUES (@PurchaseOrderId, @RecipientAddress); SELECT SCOPE_IDENTITY();", shippingSlip, transaction);
         }

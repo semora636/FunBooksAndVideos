@@ -1,7 +1,7 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.BusinessLogic.Services
 {
@@ -19,12 +19,12 @@ namespace Kata.BusinessLogic.Services
             return await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId);
         }
 
-        public async Task<int> AddOrderItemAsync(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection)
+        public async Task<int> AddOrderItemAsync(OrderItem orderItem, IDbTransaction transaction, IDbConnection connection)
         {
             return await _orderItemRepository.AddOrderItemAsync(orderItem, transaction, connection);
         }
 
-        public async Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection)
+        public async Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, IDbTransaction transaction, IDbConnection connection)
         {
             await _orderItemRepository.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, transaction, connection);
         }

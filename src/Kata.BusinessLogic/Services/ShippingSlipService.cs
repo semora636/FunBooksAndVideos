@@ -1,7 +1,7 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Kata.BusinessLogic.Services
 {
@@ -21,7 +21,7 @@ namespace Kata.BusinessLogic.Services
             return await _shippingSlipRepository.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId);
         }
 
-        public async Task GenerateShippingSlipAsync(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction)
+        public async Task GenerateShippingSlipAsync(PurchaseOrder purchaseOrder, IDbConnection connection, IDbTransaction transaction)
         {
             var customer = await _customerRepository.GetCustomerByIdAsync(purchaseOrder.CustomerId);
             if (customer != null)
