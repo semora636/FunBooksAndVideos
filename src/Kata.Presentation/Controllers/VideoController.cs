@@ -18,16 +18,16 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Video>> GetAllVideo()
+        public async Task<ActionResult<IEnumerable<Video>>> GetAllVideoAsync()
         {
-            var video = _videoService.GetAllVideos();
+            var video =await _videoService.GetAllVideosAsync();
             return Ok(video);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Video> GetVideoById(int id)
+        public async Task<ActionResult<Video>> GetVideoByIdAsync(int id)
         {
-            var video = _videoService.GetVideoById(id);
+            var video = await _videoService.GetVideoByIdAsync(id);
 
             if (video == null)
             {
@@ -38,28 +38,28 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Video> AddVideo([FromBody] Video video)
+        public async Task<ActionResult<Video>> AddVideoAsync([FromBody] Video video)
         {
-            _videoService.AddVideo(video);
-            return CreatedAtAction(nameof(GetVideoById), new { id = video.VideoId }, video);
+            await _videoService.AddVideoAsync(video);
+            return CreatedAtAction(nameof(GetVideoByIdAsync), new { id = video.VideoId }, video);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateVideo(int id, [FromBody] Video video)
+        public async Task<IActionResult> UpdateVideoAsync(int id, [FromBody] Video video)
         {
             if (id != video.VideoId)
             {
                 return BadRequest("VideoId in the request body must match the id in the URL.");
             }
 
-            _videoService.UpdateVideo(video);
+            await _videoService.UpdateVideoAsync(video);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteVideo(int id)
+        public async Task<IActionResult> DeleteVideoAsync(int id)
         {
-            _videoService.DeleteVideo(id);
+            await _videoService.DeleteVideoAsync(id);
             return NoContent();
         }
     }

@@ -4,10 +4,10 @@ namespace Kata.BusinessLogic.Interfaces
 {
     public interface IMembershipProductService
     {
-        MembershipProduct? GetMembershipProductById(int membershipProductId);
-        IEnumerable<MembershipProduct> GetAllMembershipProducts();
-        void AddMembershipProduct(MembershipProduct membershipProduct);
-        void UpdateMembershipProduct(MembershipProduct membershipProduct);
-        void DeleteMembershipProduct(int membershipProductId);
+        Task<MembershipProduct?> GetMembershipProductByIdAsync(int membershipProductId);
+        Task<IEnumerable<MembershipProduct>> GetAllMembershipProductsAsync();
+        Task AddMembershipProductAsync(MembershipProduct membershipProduct);
+        Task UpdateMembershipProductAsync(MembershipProduct membershipProduct);
+        Task DeleteMembershipProductAsync(int membershipProductId);
     }
 }

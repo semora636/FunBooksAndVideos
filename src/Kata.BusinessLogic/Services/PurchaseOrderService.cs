@@ -28,100 +28,102 @@ namespace Kata.BusinessLogic.Services
             _shippingSlipService = shippingSlipService;
         }
 
-        public PurchaseOrder? GetPurchaseOrderById(int purchaseOrderId)
+        public async Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId)
         {
-            var purchaseOrder = _purchaseOrderRepository.GetPurchaseOrderById(purchaseOrderId);
+            var purchaseOrder = await _purchaseOrderRepository.GetPurchaseOrderByIdAsync(purchaseOrderId);
 
             if (purchaseOrder != null)
             {
-                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrderId).ToList();
-                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrderId).ToList();
+                purchaseOrder.Items = (await _orderItemService.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
+                purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
             }
 
             return purchaseOrder;
         }
 
-        public IEnumerable<PurchaseOrder> GetAllPurchaseOrders()
+        public async Task<IEnumerable<PurchaseOrder>> GetAllPurchaseOrdersAsync()
         {
-            var purchaseOrders = _purchaseOrderRepository.GetAllPurchaseOrders();
+            var purchaseOrders = await _purchaseOrderRepository.GetAllPurchaseOrdersAsync();
 
             foreach (var purchaseOrder in purchaseOrders)
             {
-                purchaseOrder.Items = _orderItemService.GetOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId).ToList();
-                purchaseOrder.ShippingSlips = _shippingSlipService.GetShippingSlipsByPurchaseOrderId(purchaseOrder.PurchaseOrderId).ToList();
+                purchaseOrder.Items = (await _orderItemService.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId)).ToList();
+                purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId)).ToList();
             }
 
             return purchaseOrders;
         }
 
-        public void AddPurchaseOrder(PurchaseOrder purchaseOrder)
+        public async Task AddPurchaseOrderAsync(PurchaseOrder purchaseOrder)
         {
-            ExecuteTransaction((transaction, connection) =>
+            await ExecuteTransactionAsync(async (transaction, connection) =>
             {
                 if (purchaseOrder.Items != null)
                 {
                     purchaseOrder.OrderDateTime = DateTime.UtcNow;
                     purchaseOrder.TotalPrice = purchaseOrder.Items.Sum(item => item.Price * item.Quantity);
-                    purchaseOrder.PurchaseOrderId = _purchaseOrderRepository.AddPurchaseOrder(purchaseOrder, transaction, connection);
+                    purchaseOrder.PurchaseOrderId = await _purchaseOrderRepository.AddPurchaseOrderAsync(purchaseOrder, transaction, connection);
                     purchaseOrder.ShippingSlips = new List<ShippingSlip>();
 
                     foreach (var item in purchaseOrder.Items)
                     {
                         item.PurchaseOrderId = purchaseOrder.PurchaseOrderId;
-                        item.OrderItemId = _orderItemService.AddOrderItem(item, transaction, connection);
+
+                        // TODO: Add validation to make sure the product exists
+                        item.OrderItemId = await _orderItemService.AddOrderItemAsync(item, transaction, connection);
 
                         if (item.ProductType == Domain.Enums.ProductType.Membership)
                         {
                             // If the item is a membership product, we need to add it to Membership table
-                            _membershipService.ActivateMembership(purchaseOrder, connection, transaction, item);
+                            await _membershipService.ActivateMembershipAsync(purchaseOrder, connection, transaction, item);
                         }
                         else if (item.ProductType == Domain.Enums.ProductType.Book)
                         {
                             // If the item is a phisical product, so we need to generate a shipping slip
-                            _shippingSlipService.GenerateShippingSlip(purchaseOrder, connection, transaction);
+                            await _shippingSlipService.GenerateShippingSlipAsync(purchaseOrder, connection, transaction);
                         }
                     }
                 }
             });
         }
 
-        public void UpdatePurchaseOrder(PurchaseOrder purchaseOrder)
+        public async Task UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder)
         {
-            ExecuteTransaction((transaction, connection) =>
+            await ExecuteTransactionAsync(async (transaction, connection) =>
             {
-                _purchaseOrderRepository.UpdatePurchaseOrder(purchaseOrder, transaction, connection);
-                _orderItemService.DeleteOrderItemsByPurchaseOrderId(purchaseOrder.PurchaseOrderId, transaction, connection);
+                await _purchaseOrderRepository.UpdatePurchaseOrderAsync(purchaseOrder, transaction, connection);
+                await _orderItemService.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId, transaction, connection);
 
                 if (purchaseOrder.Items != null)
                 {
                     foreach (var item in purchaseOrder.Items)
                     {
                         item.PurchaseOrderId = purchaseOrder.PurchaseOrderId;
-                        item.OrderItemId = _orderItemService.AddOrderItem(item, transaction, connection);
+                        item.OrderItemId = await _orderItemService.AddOrderItemAsync(item, transaction, connection);
                     }
                 }
             });
         }
 
-        public void DeletePurchaseOrder(int purchaseOrderId)
+        public async Task DeletePurchaseOrderAsync(int purchaseOrderId)
         {
-            ExecuteTransaction((transaction, connection) =>
+            await ExecuteTransactionAsync(async (transaction, connection) =>
             {
-                _orderItemService.DeleteOrderItemsByPurchaseOrderId(purchaseOrderId, transaction, connection);
-                _purchaseOrderRepository.DeletePurchaseOrder(purchaseOrderId, transaction, connection);
+                await _orderItemService.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, transaction, connection);
+                await _purchaseOrderRepository.DeletePurchaseOrderAsync(purchaseOrderId, transaction, connection);
 
             });
         }
 
-        private void ExecuteTransaction(Action<SqlTransaction, SqlConnection> operation)
+        private async Task ExecuteTransactionAsync(Func<SqlTransaction, SqlConnection, Task> operation)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Open();
+            await connection.OpenAsync();
             using var transaction = connection.BeginTransaction();
 
             try
             {
-                operation(transaction, connection);
+                await operation(transaction, connection);
                 transaction.Commit();
             }
             catch (Exception)

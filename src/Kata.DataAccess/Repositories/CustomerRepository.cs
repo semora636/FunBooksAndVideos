@@ -13,34 +13,34 @@ namespace Kata.DataAccess.Repositories
             _dataAccess = dataAccess;
         }
 
-        public Customer? GetCustomerById(int customerId)
+        public async Task<Customer?> GetCustomerByIdAsync(int customerId)
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.QueryFirstOrDefault<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId", new { CustomerId = customerId });
+            return await connection.QueryFirstOrDefaultAsync<Customer>("SELECT * FROM Customers WHERE CustomerId = @CustomerId", new { CustomerId = customerId });
         }
 
-        public IEnumerable<Customer> GetAllCustomers()
+        public async Task<IEnumerable<Customer>> GetAllCustomersAsync()
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.Query<Customer>("SELECT * FROM Customers");
+            return await connection.QueryAsync<Customer>("SELECT * FROM Customers");
         }
 
-        public void AddCustomer(Customer customer)
+        public async Task AddCustomerAsync(Customer customer)
         {
             using var connection = _dataAccess.CreateConnection();
-            customer.CustomerId = connection.ExecuteScalar<int>("INSERT INTO Customers (FirstName, LastName, EmailAddress, Address) VALUES (@FirstName, @LastName, @EmailAddress, @Address); SELECT SCOPE_IDENTITY();", customer);
+            customer.CustomerId = await connection.ExecuteScalarAsync<int>("INSERT INTO Customers (FirstName, LastName, EmailAddress, Address) VALUES (@FirstName, @LastName, @EmailAddress, @Address); SELECT SCOPE_IDENTITY();", customer);
         }
 
-        public void UpdateCustomer(Customer customer)
+        public async Task UpdateCustomerAsync(Customer customer)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("UPDATE Customers SET FirstName = @FirstName, LastName = @LastName, EmailAddress = @EmailAddress, Address = @Address WHERE CustomerId = @CustomerId", customer);
+            await connection.ExecuteAsync("UPDATE Customers SET FirstName = @FirstName, LastName = @LastName, EmailAddress = @EmailAddress, Address = @Address WHERE CustomerId = @CustomerId", customer);
         }
 
-        public void DeleteCustomer(int customerId)
+        public async Task DeleteCustomerAsync(int customerId)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("DELETE FROM Customers WHERE CustomerId = @CustomerId", new { CustomerId = customerId });
+            await connection.ExecuteAsync("DELETE FROM Customers WHERE CustomerId = @CustomerId", new { CustomerId = customerId });
         }
     }
 }

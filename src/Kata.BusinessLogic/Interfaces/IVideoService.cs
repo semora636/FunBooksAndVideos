@@ -4,10 +4,10 @@ namespace Kata.BusinessLogic.Interfaces
 {
     public interface IVideoService
     {
-        Video? GetVideoById(int videoId);
-        IEnumerable<Video> GetAllVideos();
-        void AddVideo(Video video);
-        void UpdateVideo(Video video);
-        void DeleteVideo(int videoId);
+        Task<Video?> GetVideoByIdAsync(int videoId);
+        Task<IEnumerable<Video>> GetAllVideosAsync();
+        Task AddVideoAsync(Video video);
+        Task UpdateVideoAsync(Video video);
+        Task DeleteVideoAsync(int videoId);
     }
 }

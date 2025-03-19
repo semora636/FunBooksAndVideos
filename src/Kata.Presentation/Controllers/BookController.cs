@@ -18,16 +18,16 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Book>> GetAllBooks()
+        public async Task<ActionResult<IEnumerable<Book>>> GetAllBooksAsync()
         {
-            var books = _bookService.GetAllBooks();
+            var books = await _bookService.GetAllBooksAsync();
             return Ok(books);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Book> GetBookById(int id)
+        public async Task<ActionResult<Book>> GetBookByIdAsync(int id)
         {
-            var book = _bookService.GetBookById(id);
+            var book = await _bookService.GetBookByIdAsync(id);
 
             if (book == null)
             {
@@ -38,28 +38,28 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Book> AddBook([FromBody] Book book)
+        public async Task<ActionResult<Book>> AddBookAsync([FromBody] Book book)
         {
-            _bookService.AddBook(book);
-            return CreatedAtAction(nameof(GetBookById), new { id = book.BookId }, book);
+            await _bookService.AddBookAsync(book);
+            return CreatedAtAction(nameof(GetBookByIdAsync), new { id = book.BookId }, book);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(int id, [FromBody] Book book)
+        public async Task<IActionResult> UpdateBookAsync(int id, [FromBody] Book book)
         {
             if (id != book.BookId)
             {
                 return BadRequest("BookId in the request body must match the id in the URL.");
             }
 
-            _bookService.UpdateBook(book);
+            await _bookService.UpdateBookAsync(book);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteBook(int id)
+        public async Task<IActionResult> DeleteBookAsync(int id)
         {
-            _bookService.DeleteBook(id);
+            await _bookService.DeleteBookAsync(id);
             return NoContent();
         }
     }

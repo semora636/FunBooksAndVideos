@@ -5,7 +5,7 @@ namespace Kata.DataAccess.Interfaces
 {
     public interface IShippingSlipRepository
     {
-        IEnumerable<ShippingSlip> GetShippingSlipsByPurchaseOrderId(int purchaseOrderId);
-        void AddShippingSlip(ShippingSlip shippingSlip, SqlTransaction transaction, SqlConnection connection);
+        Task<IEnumerable<ShippingSlip>> GetShippingSlipsByPurchaseOrderIdAsync(int purchaseOrderId);
+        Task AddShippingSlipAsync(ShippingSlip shippingSlip, SqlTransaction transaction, SqlConnection connection);
     }
 }

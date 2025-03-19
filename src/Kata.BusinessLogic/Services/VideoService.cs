@@ -13,29 +13,29 @@ namespace Kata.BusinessLogic.Services
             _videoRepository = videoRepository;
         }
 
-        public Video? GetVideoById(int videoId)
+        public async Task<Video?> GetVideoByIdAsync(int videoId)
         {
-            return _videoRepository.GetVideoById(videoId);
+            return await _videoRepository.GetVideoByIdAsync(videoId);
         }
 
-        public IEnumerable<Video> GetAllVideos()
+        public async Task<IEnumerable<Video>> GetAllVideosAsync()
         {
-            return _videoRepository.GetAllVideos();
+            return await _videoRepository.GetAllVideosAsync();
         }
 
-        public void AddVideo(Video video)
+        public async Task AddVideoAsync(Video video)
         {
-            _videoRepository.AddVideo(video);
+            await _videoRepository.AddVideoAsync(video);
         }
 
-        public void UpdateVideo(Video video)
+        public async Task UpdateVideoAsync(Video video)
         {
-            _videoRepository.UpdateVideo(video);
+            await _videoRepository.UpdateVideoAsync(video);
         }
 
-        public void DeleteVideo(int videoId)
+        public async Task DeleteVideoAsync(int videoId)
         {
-            _videoRepository.DeleteVideo(videoId);
+            await _videoRepository.DeleteVideoAsync(videoId);
         }
     }
 }

@@ -18,16 +18,16 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<MembershipProduct>> GetAllMembershipProducts()
+        public async Task<ActionResult<IEnumerable<MembershipProduct>>> GetAllMembershipProductsAsync()
         {
-            var membershipProducts = _membershipProductService.GetAllMembershipProducts();
+            var membershipProducts = await _membershipProductService.GetAllMembershipProductsAsync();
             return Ok(membershipProducts);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<MembershipProduct> GetMembershipProductById(int id)
+        public async Task<ActionResult<MembershipProduct>> GetMembershipProductByIdAsync(int id)
         {
-            var membershipProduct = _membershipProductService.GetMembershipProductById(id);
+            var membershipProduct = await _membershipProductService.GetMembershipProductByIdAsync(id);
 
             if (membershipProduct == null)
             {
@@ -38,28 +38,28 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpPost]
-        public ActionResult<MembershipProduct> AddMembershipProduct([FromBody] MembershipProduct membershipProduct)
+        public async Task<ActionResult<MembershipProduct>> AddMembershipProductAsync([FromBody] MembershipProduct membershipProduct)
         {
-            _membershipProductService.AddMembershipProduct(membershipProduct);
-            return CreatedAtAction(nameof(GetMembershipProductById), new { id = membershipProduct.MembershipProductId }, membershipProduct);
+            await _membershipProductService.AddMembershipProductAsync(membershipProduct);
+            return CreatedAtAction(nameof(GetMembershipProductByIdAsync), new { id = membershipProduct.MembershipProductId }, membershipProduct);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateMembershipProduct(int id, [FromBody] MembershipProduct membershipProduct)
+        public async Task<IActionResult> UpdateMembershipProductAsync(int id, [FromBody] MembershipProduct membershipProduct)
         {
             if (id != membershipProduct.MembershipProductId)
             {
                 return BadRequest("MembershipProductId in the request body must match the id in the URL.");
             }
 
-            _membershipProductService.UpdateMembershipProduct(membershipProduct);
+            await _membershipProductService.UpdateMembershipProductAsync(membershipProduct);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteMembershipProduct(int id)
+        public async Task<IActionResult> DeleteMembershipProductAsync(int id)
         {
-            _membershipProductService.DeleteMembershipProduct(id);
+            await _membershipProductService.DeleteMembershipProductAsync(id);
             return NoContent();
         }
     }

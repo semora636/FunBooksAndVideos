@@ -4,10 +4,10 @@ namespace Kata.DataAccess.Interfaces
 {
     public interface ICustomerRepository
     {
-        Customer? GetCustomerById(int customerId);
-        IEnumerable<Customer> GetAllCustomers();
-        void AddCustomer(Customer customer);
-        void UpdateCustomer(Customer customer);
-        void DeleteCustomer(int customerId);
+        Task<Customer?> GetCustomerByIdAsync(int customerId);
+        Task<IEnumerable<Customer>> GetAllCustomersAsync();
+        Task AddCustomerAsync(Customer customer);
+        Task UpdateCustomerAsync(Customer customer);
+        Task DeleteCustomerAsync(int customerId);
     }
 }

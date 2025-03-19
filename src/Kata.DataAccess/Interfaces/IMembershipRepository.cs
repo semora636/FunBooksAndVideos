@@ -5,7 +5,7 @@ namespace Kata.DataAccess.Interfaces
 {
     public interface IMembershipRepository
     {
-        IEnumerable<Membership> GetMembershipsByCustomer(int customerId);
-        void AddMembership(Membership membership, SqlTransaction transaction, SqlConnection connection);
+        Task<IEnumerable<Membership>> GetMembershipsByCustomerAsync(int customerId);
+        Task AddMembershipAsync(Membership membership, SqlTransaction transaction, SqlConnection connection);
     }
 }

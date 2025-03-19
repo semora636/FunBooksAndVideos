@@ -4,10 +4,10 @@ namespace Kata.BusinessLogic.Interfaces
 {
     public interface IPurchaseOrderService
     {
-        PurchaseOrder? GetPurchaseOrderById(int purchaseOrderId);
-        IEnumerable<PurchaseOrder> GetAllPurchaseOrders();
-        void AddPurchaseOrder(PurchaseOrder purchaseOrder);
-        void UpdatePurchaseOrder(PurchaseOrder purchaseOrder);
-        void DeletePurchaseOrder(int purchaseOrderId);
+        Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId);
+        Task<IEnumerable<PurchaseOrder>> GetAllPurchaseOrdersAsync();
+        Task AddPurchaseOrderAsync(PurchaseOrder purchaseOrder);
+        Task UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder);
+        Task DeletePurchaseOrderAsync(int purchaseOrderId);
     }
 }

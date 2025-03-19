@@ -20,16 +20,16 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Customer>> GetAllCustomers()
+        public async Task<ActionResult<IEnumerable<Customer>>> GetAllCustomersAsync()
         {
-            var customers = _customerService.GetAllCustomers();
+            var customers = await _customerService.GetAllCustomersAsync();
             return Ok(customers);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Customer> GetCustomerById(int id)
+        public async Task<ActionResult<Customer>> GetCustomerByIdAsync(int id)
         {
-            var customer = _customerService.GetCustomerById(id);
+            var customer = await _customerService.GetCustomerByIdAsync(id);
 
             if (customer == null)
             {
@@ -40,35 +40,35 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpGet("{id}/memberships")]
-        public ActionResult<IEnumerable<PurchaseOrder>> GetMembershipsByCustomerId(int id)
+        public async Task<ActionResult<IEnumerable<PurchaseOrder>>> GetMembershipsByCustomerIdAsync(int id)
         {
-            var memberships = _membershipService.GetMembershipsByCustomerId(id);
+            var memberships = await _membershipService.GetMembershipsByCustomerIdAsync(id);
             return Ok(memberships);
         }
 
         [HttpPost]
-        public ActionResult<Customer> AddCustomer([FromBody] Customer customer)
+        public async Task<ActionResult<Customer>> AddCustomerAsync([FromBody] Customer customer)
         {
-            _customerService.AddCustomer(customer);
-            return CreatedAtAction(nameof(GetCustomerById), new { id = customer.CustomerId }, customer);
+            await _customerService.AddCustomerAsync(customer);
+            return CreatedAtAction(nameof(GetCustomerByIdAsync), new { id = customer.CustomerId }, customer);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateCustomer(int id, [FromBody] Customer customer)
+        public async Task<IActionResult> UpdateCustomerAsync(int id, [FromBody] Customer customer)
         {
             if (id != customer.CustomerId)
             {
                 return BadRequest("CustomerId in the request body must match the ID in the URL.");
             }
 
-            _customerService.UpdateCustomer(customer);
+            await _customerService.UpdateCustomerAsync(customer);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteCustomer(int id)
+        public async Task<IActionResult> DeleteCustomer(int id)
         {
-            _customerService.DeleteCustomer(id);
+            await _customerService.DeleteCustomerAsync(id);
             return NoContent();
         }
     }

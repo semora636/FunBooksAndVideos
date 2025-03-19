@@ -5,8 +5,8 @@ namespace Kata.DataAccess.Interfaces
 {
     public interface IOrderItemRepository
     {
-        int AddOrderItem(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection);
-        void DeleteOrderItemsByPurchaseOrderId(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
-        IEnumerable<OrderItem> GetOrderItemsByPurchaseOrderId(int purchaseOrderId);
+        Task<int> AddOrderItemAsync(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection);
+        Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
+        Task<IEnumerable<OrderItem>> GetOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId);
     }
 }

@@ -13,34 +13,34 @@ namespace Kata.DataAccess.Repositories
             _dataAccess = dataAccess;
         }
 
-        public Book? GetBookById(int bookId)
+        public async Task<Book?> GetBookByIdAsync(int bookId)
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.QueryFirstOrDefault<Book>("SELECT * FROM Books WHERE BookId = @BookId", new { BookId = bookId });
+            return await connection.QueryFirstOrDefaultAsync<Book>("SELECT * FROM Books WHERE BookId = @BookId", new { BookId = bookId });
         }
 
-        public IEnumerable<Book> GetAllBooks()
+        public async Task<IEnumerable<Book>> GetAllBooksAsync()
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.Query<Book>("SELECT * FROM Books");
+            return await connection.QueryAsync<Book>("SELECT * FROM Books");
         }
 
-        public void AddBook(Book book)
+        public async Task AddBookAsync(Book book)
         {
             using var connection = _dataAccess.CreateConnection();
-            book.BookId = connection.ExecuteScalar<int>("INSERT INTO Books (Name, Price, Author) VALUES (@Name, @Price, @Author); SELECT SCOPE_IDENTITY();", book);
+            book.BookId = await connection.ExecuteScalarAsync<int>("INSERT INTO Books (Name, Price, Author) VALUES (@Name, @Price, @Author); SELECT SCOPE_IDENTITY();", book);
         }
 
-        public void UpdateBook(Book book)
+        public async Task UpdateBookAsync(Book book)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("UPDATE Books SET Name = @Name, Price = @Price, Author = @Author WHERE BookId = @BookId", book);
+            await connection.ExecuteAsync("UPDATE Books SET Name = @Name, Price = @Price, Author = @Author WHERE BookId = @BookId", book);
         }
 
-        public void DeleteBook(int bookId)
+        public async Task DeleteBookAsync(int bookId)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("DELETE FROM Books WHERE BookId = @BookId", new { BookId = bookId });
+            await connection.ExecuteAsync("DELETE FROM Books WHERE BookId = @BookId", new { BookId = bookId });
         }
     }
 }

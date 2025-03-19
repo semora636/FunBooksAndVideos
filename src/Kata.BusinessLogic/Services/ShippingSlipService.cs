@@ -16,14 +16,14 @@ namespace Kata.BusinessLogic.Services
             _customerRepository = customerRepository;
         }
 
-        public IEnumerable<ShippingSlip> GetShippingSlipsByPurchaseOrderId(int purchaseOrderId)
+        public async Task<IEnumerable<ShippingSlip>> GetShippingSlipsByPurchaseOrderIdAsync(int purchaseOrderId)
         {
-            return _shippingSlipRepository.GetShippingSlipsByPurchaseOrderId(purchaseOrderId);
+            return await _shippingSlipRepository.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId);
         }
 
-        public void GenerateShippingSlip(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction)
+        public async Task GenerateShippingSlipAsync(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction)
         {
-            var customer = _customerRepository.GetCustomerById(purchaseOrder.CustomerId);
+            var customer = await _customerRepository.GetCustomerByIdAsync(purchaseOrder.CustomerId);
             if (customer != null)
             {
                 var shippingSlip = new ShippingSlip()
@@ -31,7 +31,7 @@ namespace Kata.BusinessLogic.Services
                     PurchaseOrderId = purchaseOrder.PurchaseOrderId,
                     RecipientAddress = customer.Address,
                 };
-                _shippingSlipRepository.AddShippingSlip(shippingSlip, transaction, connection);
+                await _shippingSlipRepository.AddShippingSlipAsync(shippingSlip, transaction, connection);
 
                 if (purchaseOrder.ShippingSlips == null)
                 {

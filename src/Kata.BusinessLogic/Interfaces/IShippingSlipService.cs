@@ -5,7 +5,7 @@ namespace Kata.BusinessLogic.Interfaces
 {
     public interface IShippingSlipService
     {
-        IEnumerable<ShippingSlip> GetShippingSlipsByPurchaseOrderId(int purchaseOrderId);
-        void GenerateShippingSlip(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction);
+        Task<IEnumerable<ShippingSlip>> GetShippingSlipsByPurchaseOrderIdAsync(int purchaseOrderId);
+        Task GenerateShippingSlipAsync(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction);
     }
 }

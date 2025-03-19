@@ -14,15 +14,15 @@ namespace Kata.DataAccess.Repositories
             _dataAccess = dataAccess;
         }
 
-        public IEnumerable<ShippingSlip> GetShippingSlipsByPurchaseOrderId(int purchaseOrderId)
+        public async Task<IEnumerable<ShippingSlip>> GetShippingSlipsByPurchaseOrderIdAsync(int purchaseOrderId)
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.Query<ShippingSlip>("SELECT * FROM ShippingSlips WHERE PurchaseOrderId = @PurchaseOrderId", new { PurchaseOrderId = purchaseOrderId }).ToList();
+            return await connection.QueryAsync<ShippingSlip>("SELECT * FROM ShippingSlips WHERE PurchaseOrderId = @PurchaseOrderId", new { PurchaseOrderId = purchaseOrderId });
         }
 
-        public void AddShippingSlip(ShippingSlip shippingSlip, SqlTransaction transaction, SqlConnection connection)
+        public async Task AddShippingSlipAsync(ShippingSlip shippingSlip, SqlTransaction transaction, SqlConnection connection)
         {
-            shippingSlip.ShippingSlipId = connection.ExecuteScalar<int>("INSERT INTO ShippingSlips (PurchaseOrderId, RecipientAddress) VALUES (@PurchaseOrderId, @RecipientAddress); SELECT SCOPE_IDENTITY();", shippingSlip, transaction);
+            shippingSlip.ShippingSlipId = await connection.ExecuteScalarAsync<int>("INSERT INTO ShippingSlips (PurchaseOrderId, RecipientAddress) VALUES (@PurchaseOrderId, @RecipientAddress); SELECT SCOPE_IDENTITY();", shippingSlip, transaction);
         }
     }
 }

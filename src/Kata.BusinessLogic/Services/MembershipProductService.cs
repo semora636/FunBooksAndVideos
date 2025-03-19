@@ -13,29 +13,29 @@ namespace Kata.BusinessLogic.Services
             _membershipProductRepository = membershipProductRepository;
         }
 
-        public MembershipProduct? GetMembershipProductById(int membershipProductId)
+        public async Task<MembershipProduct?> GetMembershipProductByIdAsync(int membershipProductId)
         {
-            return _membershipProductRepository.GetMembershipProductById(membershipProductId);
+            return await _membershipProductRepository.GetMembershipProductByIdAsync(membershipProductId);
         }
 
-        public IEnumerable<MembershipProduct> GetAllMembershipProducts()
+        public async Task<IEnumerable<MembershipProduct>> GetAllMembershipProductsAsync()
         {
-            return _membershipProductRepository.GetAllMembershipProducts();
+            return await _membershipProductRepository.GetAllMembershipProductsAsync();
         }
 
-        public void AddMembershipProduct(MembershipProduct membershipProduct)
+        public async Task AddMembershipProductAsync(MembershipProduct membershipProduct)
         {
-            _membershipProductRepository.AddMembershipProduct(membershipProduct);
+            await _membershipProductRepository.AddMembershipProductAsync(membershipProduct);
         }
 
-        public void UpdateMembershipProduct(MembershipProduct membershipProduct)
+        public async Task UpdateMembershipProductAsync(MembershipProduct membershipProduct)
         {
-            _membershipProductRepository.UpdateMembershipProduct(membershipProduct);
+            await _membershipProductRepository.UpdateMembershipProductAsync(membershipProduct);
         }
 
-        public void DeleteMembershipProduct(int membershipProductId)
+        public async Task DeleteMembershipProductAsync(int membershipProductId)
         {
-            _membershipProductRepository.DeleteMembershipProduct(membershipProductId);
+            await _membershipProductRepository.DeleteMembershipProductAsync(membershipProductId);
         }
     }
 }

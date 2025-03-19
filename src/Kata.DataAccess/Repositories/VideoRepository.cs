@@ -13,34 +13,34 @@ namespace Kata.DataAccess.Repositories
             _dataAccess = dataAccess;
         }
 
-        public Video? GetVideoById(int videoId)
+        public async Task<Video?> GetVideoByIdAsync(int videoId)
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.QueryFirstOrDefault<Video>("SELECT * FROM Videos WHERE VideoId = @VideoId", new { VideoId = videoId });
+            return await connection.QueryFirstOrDefaultAsync<Video>("SELECT * FROM Videos WHERE VideoId = @VideoId", new { VideoId = videoId });
         }
 
-        public IEnumerable<Video> GetAllVideos()
+        public async Task<IEnumerable<Video>> GetAllVideosAsync()
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.Query<Video>("SELECT * FROM Videos");
+            return await connection.QueryAsync<Video>("SELECT * FROM Videos");
         }
 
-        public void AddVideo(Video video)
+        public async Task AddVideoAsync(Video video)
         {
             using var connection = _dataAccess.CreateConnection();
-            video.VideoId = connection.Execute("INSERT INTO Videos (Name, Price, Director) VALUES (@Name, @Price, @Director); SELECT SCOPE_IDENTITY();", video);
+            video.VideoId = await connection.ExecuteAsync("INSERT INTO Videos (Name, Price, Director) VALUES (@Name, @Price, @Director); SELECT SCOPE_IDENTITY();", video);
         }
 
-        public void UpdateVideo(Video video)
+        public async Task UpdateVideoAsync(Video video)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("UPDATE Videos SET Name = @Name, Price = @Price, Director = @Director WHERE VideoId = @VideoId", video);
+            await connection.ExecuteAsync("UPDATE Videos SET Name = @Name, Price = @Price, Director = @Director WHERE VideoId = @VideoId", video);
         }
 
-        public void DeleteVideo(int videoId)
+        public async Task DeleteVideoAsync(int videoId)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("DELETE FROM Videos WHERE VideoId = @VideoId", new { VideoId = videoId });
+            await connection.ExecuteAsync("DELETE FROM Videos WHERE VideoId = @VideoId", new { VideoId = videoId });
         }
     }
 }

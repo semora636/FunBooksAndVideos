@@ -14,15 +14,15 @@ namespace Kata.DataAccess.Repositories
             _dataAccess = dataAccess;
         }
 
-        public IEnumerable<Membership> GetMembershipsByCustomer(int customerId)
+        public async Task<IEnumerable<Membership>> GetMembershipsByCustomerAsync(int customerId)
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.Query<Membership>("SELECT * FROM Memberships WHERE CustomerId = @CustomerId", new { CustomerId = customerId }).ToList();
+            return await connection.QueryAsync<Membership>("SELECT * FROM Memberships WHERE CustomerId = @CustomerId", new { CustomerId = customerId });
         }
 
-        public void AddMembership(Membership membership, SqlTransaction transaction, SqlConnection connection)
+        public async Task AddMembershipAsync(Membership membership, SqlTransaction transaction, SqlConnection connection)
         {
-            membership.MembershipId = connection.ExecuteScalar<int>("INSERT INTO Memberships (MembershipType, ActivationDateTime, ExpirationDateTime, CustomerId) VALUES (@MembershipType, @ActivationDateTime, @ExpirationDateTime, @CustomerId); SELECT SCOPE_IDENTITY();", membership, transaction);
+            membership.MembershipId = await connection.ExecuteScalarAsync<int>("INSERT INTO Memberships (MembershipType, ActivationDateTime, ExpirationDateTime, CustomerId) VALUES (@MembershipType, @ActivationDateTime, @ExpirationDateTime, @CustomerId); SELECT SCOPE_IDENTITY();", membership, transaction);
         }
     }
 }

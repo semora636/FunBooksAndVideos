@@ -13,29 +13,29 @@ namespace Kata.BusinessLogic.Services
             _customerRepository = customerRepository;
         }
 
-        public Customer? GetCustomerById(int customerId)
+        public async Task<Customer?> GetCustomerByIdAsync(int customerId)
         {
-            return _customerRepository.GetCustomerById(customerId);
+            return await _customerRepository.GetCustomerByIdAsync(customerId);
         }
 
-        public IEnumerable<Customer> GetAllCustomers()
+        public async Task<IEnumerable<Customer>> GetAllCustomersAsync()
         {
-            return _customerRepository.GetAllCustomers();
+            return await _customerRepository.GetAllCustomersAsync();
         }
 
-        public void AddCustomer(Customer customer)
+        public async Task AddCustomerAsync(Customer customer)
         {
-            _customerRepository.AddCustomer(customer);
+            await _customerRepository.AddCustomerAsync(customer);
         }
 
-        public void UpdateCustomer(Customer customer)
+        public async Task UpdateCustomerAsync(Customer customer)
         {
-            _customerRepository.UpdateCustomer(customer);
+            await _customerRepository.UpdateCustomerAsync(customer);
         }
 
-        public void DeleteCustomer(int customerId)
+        public async Task DeleteCustomerAsync(int customerId)
         {
-            _customerRepository.DeleteCustomer(customerId);
+            await _customerRepository.DeleteCustomerAsync(customerId);
         }
     }
 }

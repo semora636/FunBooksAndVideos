@@ -5,7 +5,7 @@ namespace Kata.BusinessLogic.Interfaces
 {
     public interface IMembershipService
     {
-        IEnumerable<Membership> GetMembershipsByCustomerId(int customerId);
-        void ActivateMembership(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction, OrderItem item);
+        Task<IEnumerable<Membership>> GetMembershipsByCustomerIdAsync(int customerId);
+        Task ActivateMembershipAsync(PurchaseOrder purchaseOrder, SqlConnection connection, SqlTransaction transaction, OrderItem item);
     }
 }

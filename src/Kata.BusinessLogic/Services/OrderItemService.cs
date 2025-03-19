@@ -14,19 +14,19 @@ namespace Kata.BusinessLogic.Services
             _orderItemRepository = orderItemRepository;
         }
 
-        public IEnumerable<OrderItem> GetOrderItemsByPurchaseOrderId(int purchaseOrderId)
+        public async Task<IEnumerable<OrderItem>> GetOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId)
         {
-            return _orderItemRepository.GetOrderItemsByPurchaseOrderId(purchaseOrderId);
+            return await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId);
         }
 
-        public int AddOrderItem(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection)
+        public async Task<int> AddOrderItemAsync(OrderItem orderItem, SqlTransaction transaction, SqlConnection connection)
         {
-            return _orderItemRepository.AddOrderItem(orderItem, transaction, connection);
+            return await _orderItemRepository.AddOrderItemAsync(orderItem, transaction, connection);
         }
 
-        public void DeleteOrderItemsByPurchaseOrderId(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection)
+        public async Task DeleteOrderItemsByPurchaseOrderIdAsync(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection)
         {
-            _orderItemRepository.DeleteOrderItemsByPurchaseOrderId(purchaseOrderId, transaction, connection);
+            await _orderItemRepository.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, transaction, connection);
         }
     }
 }

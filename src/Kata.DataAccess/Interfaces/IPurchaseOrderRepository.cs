@@ -5,10 +5,10 @@ namespace Kata.DataAccess.Interfaces
 {
     public interface IPurchaseOrderRepository
     {
-        PurchaseOrder? GetPurchaseOrderById(int purchaseOrderId);
-        IEnumerable<PurchaseOrder> GetAllPurchaseOrders();
-        int AddPurchaseOrder(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
-        void UpdatePurchaseOrder(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
-        void DeletePurchaseOrder(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
+        Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId);
+        Task<IEnumerable<PurchaseOrder>> GetAllPurchaseOrdersAsync();
+        Task<int> AddPurchaseOrderAsync(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
+        Task UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder, SqlTransaction transaction, SqlConnection connection);
+        Task DeletePurchaseOrderAsync(int purchaseOrderId, SqlTransaction transaction, SqlConnection connection);
     }
 }

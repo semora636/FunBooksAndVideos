@@ -13,34 +13,34 @@ namespace Kata.DataAccess.Repositories
             _dataAccess = dataAccess;
         }
 
-        public MembershipProduct? GetMembershipProductById(int membershipProductId)
+        public async Task<MembershipProduct?> GetMembershipProductByIdAsync(int membershipProductId)
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.QueryFirstOrDefault<MembershipProduct>("SELECT * FROM MembershipProducts WHERE MembershipProductId = @MembershipProductId", new { MembershipProductId = membershipProductId });
+            return await connection.QueryFirstOrDefaultAsync<MembershipProduct>("SELECT * FROM MembershipProducts WHERE MembershipProductId = @MembershipProductId", new { MembershipProductId = membershipProductId });
         }
 
-        public IEnumerable<MembershipProduct> GetAllMembershipProducts()
+        public async Task<IEnumerable<MembershipProduct>> GetAllMembershipProductsAsync()
         {
             using var connection = _dataAccess.CreateConnection();
-            return connection.Query<MembershipProduct>("SELECT * FROM MembershipProducts");
+            return await connection.QueryAsync<MembershipProduct>("SELECT * FROM MembershipProducts");
         }
 
-        public void AddMembershipProduct(MembershipProduct membershipProduct)
+        public async Task AddMembershipProductAsync(MembershipProduct membershipProduct)
         {
             using var connection = _dataAccess.CreateConnection();
-            membershipProduct.MembershipProductId = connection.ExecuteScalar<int>("INSERT INTO MembershipProducts (Name, MembershipType, Price, DurationMonths) VALUES (@Name, @MembershipType, @Price, @DurationMonths); SELECT SCOPE_IDENTITY();", membershipProduct);
+            membershipProduct.MembershipProductId = await connection.ExecuteScalarAsync<int>("INSERT INTO MembershipProducts (Name, MembershipType, Price, DurationMonths) VALUES (@Name, @MembershipType, @Price, @DurationMonths); SELECT SCOPE_IDENTITY();", membershipProduct);
         }
 
-        public void UpdateMembershipProduct(MembershipProduct membershipProduct)
+        public async Task UpdateMembershipProductAsync(MembershipProduct membershipProduct)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("UPDATE MembershipProducts SET Name = @Name, MembershipType = @MembershipType, Price = @Price, DurationMonths = @DurationMonths WHERE MembershipProductId = @MembershipProductId", membershipProduct);
+            await connection.ExecuteAsync("UPDATE MembershipProducts SET Name = @Name, MembershipType = @MembershipType, Price = @Price, DurationMonths = @DurationMonths WHERE MembershipProductId = @MembershipProductId", membershipProduct);
         }
 
-        public void DeleteMembershipProduct(int membershipProductId)
+        public async Task DeleteMembershipProductAsync(int membershipProductId)
         {
             using var connection = _dataAccess.CreateConnection();
-            connection.Execute("DELETE FROM MembershipProducts WHERE MembershipProductId = @MembershipProductId", new { MembershipProductId = membershipProductId });
+            await connection.ExecuteAsync("DELETE FROM MembershipProducts WHERE MembershipProductId = @MembershipProductId", new { MembershipProductId = membershipProductId });
         }
     }
 }

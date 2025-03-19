@@ -18,16 +18,16 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<PurchaseOrder>> GetAllPurchaseOrders()
+        public async Task<ActionResult<IEnumerable<PurchaseOrder>>> GetAllPurchaseOrdersAsync()
         {
-            var purchaseOrders = _purchaseOrderService.GetAllPurchaseOrders();
+            var purchaseOrders = await _purchaseOrderService.GetAllPurchaseOrdersAsync();
             return Ok(purchaseOrders);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<PurchaseOrder> GetPurchaseOrderById(int id)
+        public async Task<ActionResult<PurchaseOrder>> GetPurchaseOrderByIdAsync(int id)
         {
-            var purchaseOrder = _purchaseOrderService.GetPurchaseOrderById(id);
+            var purchaseOrder = await _purchaseOrderService.GetPurchaseOrderByIdAsync(id);
 
             if (purchaseOrder == null)
             {
@@ -38,28 +38,28 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PurchaseOrder> AddPurchaseOrder([FromBody] PurchaseOrder purchaseOrder)
+        public async Task<ActionResult<PurchaseOrder>> AddPurchaseOrderAsync([FromBody] PurchaseOrder purchaseOrder)
         {
-            _purchaseOrderService.AddPurchaseOrder(purchaseOrder);
-            return CreatedAtAction(nameof(GetPurchaseOrderById), new { id = purchaseOrder.PurchaseOrderId }, purchaseOrder);
+            await _purchaseOrderService.AddPurchaseOrderAsync(purchaseOrder);
+            return CreatedAtAction(nameof(GetPurchaseOrderByIdAsync), new { id = purchaseOrder.PurchaseOrderId }, purchaseOrder);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdatePurchaseOrder(int id, [FromBody] PurchaseOrder purchaseOrder)
+        public async Task<IActionResult> UpdatePurchaseOrderAsync(int id, [FromBody] PurchaseOrder purchaseOrder)
         {
             if (id != purchaseOrder.PurchaseOrderId)
             {
                 return BadRequest("PurchaseOrderId in the request body must match the ID in the URL.");
             }
 
-            _purchaseOrderService.UpdatePurchaseOrder(purchaseOrder);
+            await _purchaseOrderService.UpdatePurchaseOrderAsync(purchaseOrder);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeletePurchaseOrder(int id)
+        public async Task<IActionResult> DeletePurchaseOrderAsync(int id)
         {
-            _purchaseOrderService.DeletePurchaseOrder(id);
+            await _purchaseOrderService.DeletePurchaseOrderAsync(id);
             return NoContent();
         }
     }
