@@ -1,5 +1,6 @@
 using Kata.BusinessLogic;
 using Kata.Presentation.Authentication;
+using Kata.Presentation.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -76,6 +77,8 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

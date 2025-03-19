@@ -22,102 +22,54 @@ namespace Kata.Presentation.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Customer>> GetAllCustomers()
         {
-            try
-            {
-                var customers = _customerService.GetAllCustomers();
-                return Ok(customers);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving all customers.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            var customers = _customerService.GetAllCustomers();
+            return Ok(customers);
         }
 
         [HttpGet("{id}")]
         public ActionResult<Customer> GetCustomerById(int id)
         {
-            try
-            {
-                var customer = _customerService.GetCustomerById(id);
+            var customer = _customerService.GetCustomerById(id);
 
-                if (customer == null)
-                {
-                    return NotFound();
-                }
-
-                return Ok(customer);
-            }
-            catch (Exception ex)
+            if (customer == null)
             {
-                _logger.LogError(ex, $"Error retrieving customer with ID {id}.");
-                return StatusCode(500, "Internal Server Error");
+                return NotFound();
             }
+
+            return Ok(customer);
         }
 
         [HttpGet("{id}/memberships")]
         public ActionResult<IEnumerable<PurchaseOrder>> GetMembershipsByCustomerId(int id)
         {
-            try
-            {
-                var memberships = _membershipService.GetMembershipsByCustomerId(id);
-                return Ok(memberships);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving all purchase orders.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            var memberships = _membershipService.GetMembershipsByCustomerId(id);
+            return Ok(memberships);
         }
 
         [HttpPost]
         public ActionResult<Customer> AddCustomer([FromBody] Customer customer)
         {
-            try
-            {
-                _customerService.AddCustomer(customer);
-                return CreatedAtAction(nameof(GetCustomerById), new { id = customer.CustomerId }, customer);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding a new customer.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            _customerService.AddCustomer(customer);
+            return CreatedAtAction(nameof(GetCustomerById), new { id = customer.CustomerId }, customer);
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateCustomer(int id, [FromBody] Customer customer)
         {
-            try
+            if (id != customer.CustomerId)
             {
-                if (id != customer.CustomerId)
-                {
-                    return BadRequest("CustomerId in the request body must match the ID in the URL.");
-                }
+                return BadRequest("CustomerId in the request body must match the ID in the URL.");
+            }
 
-                _customerService.UpdateCustomer(customer);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error updating customer with ID {id}.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            _customerService.UpdateCustomer(customer);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteCustomer(int id)
         {
-            try
-            {
-                _customerService.DeleteCustomer(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error deleting customer with ID {id}.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            _customerService.DeleteCustomer(id);
+            return NoContent();
         }
     }
 }
