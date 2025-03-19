@@ -1,7 +1,9 @@
+using HealthChecks.UI.Client;
 using Kata.BusinessLogic;
 using Kata.Presentation.Authentication;
 using Kata.Presentation.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -79,11 +81,16 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddSqlServer(connectionString);
 
 var app = builder.Build();
 
-app.MapHealthChecks("/health")
+app.MapHealthChecks("/health",
+    new HealthCheckOptions
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    })
     .RequireAuthorization();
 
 app.UseMiddleware<ExceptionMiddleware>();
