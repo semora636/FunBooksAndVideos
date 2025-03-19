@@ -40,7 +40,7 @@ namespace Kata.Presentation.Controllers
         }
 
         [HttpGet("{id}/memberships")]
-        public async Task<ActionResult<IEnumerable<PurchaseOrder>>> GetMembershipsByCustomerIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<Membership>>> GetMembershipsByCustomerIdAsync(int id)
         {
             var memberships = await _membershipService.GetMembershipsByCustomerIdAsync(id);
             return Ok(memberships);

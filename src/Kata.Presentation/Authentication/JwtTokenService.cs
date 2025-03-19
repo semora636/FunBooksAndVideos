@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kata.Presentation.Authentication
 {
-    public class JwtTokenService
+    public class JwtTokenService : IJwtTokenService
     {
         private readonly IConfiguration _configuration;
 

@@ -7,9 +7,9 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly JwtTokenService _jwtTokenService;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public AuthController(JwtTokenService jwtTokenService)
+        public AuthController(IJwtTokenService jwtTokenService)
         {
             _jwtTokenService = jwtTokenService;
         }
@@ -21,7 +21,7 @@ namespace Kata.Presentation.Controllers
             if (loginModel.Username == "user" && loginModel.Password == "password")
             {
                 var token = _jwtTokenService.GenerateToken(loginModel.Username);
-                return Ok(new { Token = token });
+                return Ok(new TokenResponse { Token = token });
             }
 
             return Unauthorized();
@@ -32,5 +32,10 @@ namespace Kata.Presentation.Controllers
     {
         public required string Username { get; set; }
         public required string Password { get; set; }
+    }
+
+    public class TokenResponse
+    {
+        public required string Token { get; set; }
     }
 }

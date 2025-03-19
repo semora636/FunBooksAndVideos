@@ -44,6 +44,8 @@ if (string.IsNullOrEmpty(connectionString))
 
 builder.Services.RegisterBusinessLogicRepositories(connectionString);
 
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
 builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
