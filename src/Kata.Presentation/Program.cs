@@ -1,7 +1,10 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using HealthChecks.UI.Client;
 using Kata.BusinessLogic;
 using Kata.Presentation.Authentication;
 using Kata.Presentation.Middlewares;
+using Kata.Presentation.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
@@ -49,6 +52,14 @@ builder.Services.RegisterBusinessLogicRepositories(connectionString);
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<BookValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CustomerValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<MembershipProductValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<PurchaseOrderValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<OrderItemValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<VideoValidator>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
