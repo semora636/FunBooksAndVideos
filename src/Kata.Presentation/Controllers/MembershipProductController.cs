@@ -1,5 +1,6 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kata.Presentation.Controllers
@@ -37,6 +38,7 @@ namespace Kata.Presentation.Controllers
             return Ok(membershipProduct);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<MembershipProduct>> AddMembershipProductAsync([FromBody] MembershipProduct membershipProduct)
         {
@@ -44,6 +46,7 @@ namespace Kata.Presentation.Controllers
             return CreatedAtAction(nameof(GetMembershipProductByIdAsync), new { id = membershipProduct.MembershipProductId }, membershipProduct);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMembershipProductAsync(int id, [FromBody] MembershipProduct membershipProduct)
         {
@@ -56,6 +59,7 @@ namespace Kata.Presentation.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMembershipProductAsync(int id)
         {

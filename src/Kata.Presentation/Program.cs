@@ -79,7 +79,12 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
+
+app.MapHealthChecks("/health")
+    .RequireAuthorization();
 
 app.UseMiddleware<ExceptionMiddleware>();
 

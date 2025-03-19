@@ -1,5 +1,6 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kata.Presentation.Controllers
@@ -37,6 +38,7 @@ namespace Kata.Presentation.Controllers
             return Ok(book);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Book>> AddBookAsync([FromBody] Book book)
         {
@@ -44,6 +46,7 @@ namespace Kata.Presentation.Controllers
             return CreatedAtAction(nameof(GetBookByIdAsync), new { id = book.BookId }, book);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBookAsync(int id, [FromBody] Book book)
         {
@@ -56,6 +59,7 @@ namespace Kata.Presentation.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBookAsync(int id)
         {
