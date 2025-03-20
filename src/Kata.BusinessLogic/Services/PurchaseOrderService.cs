@@ -29,27 +29,20 @@ namespace Kata.BusinessLogic.Services
 
         public async Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId)
         {
-            var purchaseOrder = await _purchaseOrderRepository.GetPurchaseOrderByIdAsync(purchaseOrderId);
+            var purchaseOrder = await _purchaseOrderRepository.GetPurchaseOrderWithItemsAndSlipByIdAsync(purchaseOrderId);
 
-            if (purchaseOrder != null)
-            {
-                purchaseOrder.Items = (await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
-                purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
-            }
+            //if (purchaseOrder != null)
+            //{
+            //    purchaseOrder.Items = (await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
+            //    purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
+            //}
 
             return purchaseOrder;
         }
 
         public async Task<IEnumerable<PurchaseOrder>> GetAllPurchaseOrdersAsync()
         {
-            var purchaseOrders = await _purchaseOrderRepository.GetAllPurchaseOrdersAsync();
-
-            foreach (var purchaseOrder in purchaseOrders)
-            {
-                purchaseOrder.Items = (await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId)).ToList();
-                purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId)).ToList();
-            }
-
+            var purchaseOrders = await _purchaseOrderRepository.GetAllPurchaseOrdersWithItemsAndSlipsAsync();
             return purchaseOrders;
         }
 
