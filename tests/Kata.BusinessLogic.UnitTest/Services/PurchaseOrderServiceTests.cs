@@ -21,6 +21,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
         private readonly Mock<IProductProcessor> _mockMembershipProductProcessor;
         private readonly Mock<IProductProcessor> _mockShippableProductProcessor;
         private readonly IEnumerable<IProductProcessor> _mockProductProcessors;
+        private readonly Mock<ITransactionHandler> _mockTransactionHandler;
 
         public PurchaseOrderServiceTests()
         {
@@ -48,12 +49,17 @@ namespace Kata.BusinessLogic.UnitTest.Services
                 _mockShippableProductProcessor.Object
             };
 
+            _mockTransactionHandler = new Mock<ITransactionHandler>();
+            _mockTransactionHandler.Setup(th => th.ExecuteTransactionAsync(It.IsAny<Func<IDbTransaction, IDbConnection, Task>>()))
+                .Returns((Func<IDbTransaction, IDbConnection, Task> operation) => operation(_mockTransaction.Object, _mockConnection.Object));
+
             _purchaseOrderService = new PurchaseOrderService(
                 _mockDataAccess.Object,
                 _mockPurchaseOrderRepository.Object,
                 _mockOrderItemService.Object,
                 _mockShippingSlipService.Object,
-                _mockProductProcessors);
+                _mockProductProcessors,
+                _mockTransactionHandler.Object);
         }
 
         [Fact]
@@ -105,7 +111,6 @@ namespace Kata.BusinessLogic.UnitTest.Services
             Assert.Equal(orderItems2, result.Last().Items);
             Assert.Equal(shippingSlips2, result.Last().ShippingSlips);
         }
-
         [Fact]
         public async Task AddPurchaseOrderAsync_AddsPurchaseOrderWithItemsAndMembership()
         {

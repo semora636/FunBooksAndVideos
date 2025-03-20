@@ -1,4 +1,5 @@
-﻿using Kata.BusinessLogic.Interfaces;
+﻿using Kata.BusinessLogic.Handlers;
+using Kata.BusinessLogic.Interfaces;
 using Kata.BusinessLogic.ProductProcessors;
 using Kata.BusinessLogic.Services;
 using Kata.DataAccess;
@@ -35,6 +36,8 @@ namespace Kata.BusinessLogic
 
             services.AddScoped<IProductProcessor, MembershipProductProcessor>();
             services.AddScoped<IProductProcessor, ShippableProductProcessor>();
+
+            services.AddScoped<ITransactionHandler, TransactionHandler>();
 
             return services;
         }

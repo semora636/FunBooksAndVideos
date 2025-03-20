@@ -2,7 +2,6 @@
 using Kata.DataAccess;
 using Kata.DataAccess.Interfaces;
 using Kata.Domain.Entities;
-using System.Data;
 
 namespace Kata.BusinessLogic.Services
 {
@@ -13,19 +12,22 @@ namespace Kata.BusinessLogic.Services
         private readonly IShippingSlipService _shippingSlipService;
         private readonly ISqlDataAccess _dataAccess;
         private readonly IEnumerable<IProductProcessor> _productProcessors;
+        private readonly ITransactionHandler _transactionHandler;
 
         public PurchaseOrderService(
             ISqlDataAccess dataAccess,
             IPurchaseOrderRepository purchaseOrderRepository,
             IOrderItemService orderItemService,
             IShippingSlipService shippingSlipService,
-            IEnumerable<IProductProcessor> productProcessors)
+            IEnumerable<IProductProcessor> productProcessors,
+            ITransactionHandler transactionHandler)
         {
             _dataAccess = dataAccess;
             _purchaseOrderRepository = purchaseOrderRepository;
             _orderItemService = orderItemService;
             _shippingSlipService = shippingSlipService;
             _productProcessors = productProcessors;
+            _transactionHandler = transactionHandler;
         }
 
         public async Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId)
@@ -56,7 +58,7 @@ namespace Kata.BusinessLogic.Services
 
         public async Task AddPurchaseOrderAsync(PurchaseOrder purchaseOrder)
         {
-            await ExecuteTransactionAsync(async (transaction, connection) =>
+            await _transactionHandler.ExecuteTransactionAsync(async (transaction, connection) =>
             {
                 if (purchaseOrder.Items != null)
                 {
@@ -84,7 +86,7 @@ namespace Kata.BusinessLogic.Services
 
         public async Task UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder)
         {
-            await ExecuteTransactionAsync(async (transaction, connection) =>
+            await _transactionHandler.ExecuteTransactionAsync(async (transaction, connection) =>
             {
                 await _purchaseOrderRepository.UpdatePurchaseOrderAsync(purchaseOrder, transaction, connection);
                 await _orderItemService.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId, transaction, connection);
@@ -102,34 +104,12 @@ namespace Kata.BusinessLogic.Services
 
         public async Task DeletePurchaseOrderAsync(int purchaseOrderId)
         {
-            await ExecuteTransactionAsync(async (transaction, connection) =>
+            await _transactionHandler.ExecuteTransactionAsync(async (transaction, connection) =>
             {
                 await _orderItemService.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, transaction, connection);
                 await _purchaseOrderRepository.DeletePurchaseOrderAsync(purchaseOrderId, transaction, connection);
 
             });
-        }
-
-        private async Task ExecuteTransactionAsync(Func<IDbTransaction, IDbConnection, Task> operation)
-        {
-            using var connection = _dataAccess.CreateConnection();
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-
-            try
-            {
-                await operation(transaction, connection);
-                transaction.Commit();
-            }
-            catch (Exception)
-            {
-                transaction.Rollback();
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
         }
     }
 }
