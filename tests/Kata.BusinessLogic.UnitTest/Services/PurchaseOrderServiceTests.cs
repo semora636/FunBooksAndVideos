@@ -12,7 +12,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
     public class PurchaseOrderServiceTests
     {
         private readonly Mock<IPurchaseOrderRepository> _mockPurchaseOrderRepository;
-        private readonly Mock<IOrderItemService> _mockOrderItemService;
+        private readonly Mock<IOrderItemRepository> _mockOrderItemRepository;
         private readonly Mock<IShippingSlipService> _mockShippingSlipService;
         private readonly Mock<ISqlDataAccess> _mockDataAccess;
         private readonly PurchaseOrderService _purchaseOrderService;
@@ -26,7 +26,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
         public PurchaseOrderServiceTests()
         {
             _mockPurchaseOrderRepository = new Mock<IPurchaseOrderRepository>();
-            _mockOrderItemService = new Mock<IOrderItemService>();
+            _mockOrderItemRepository = new Mock<IOrderItemRepository>();
             _mockShippingSlipService = new Mock<IShippingSlipService>();
             
             _mockTransaction = new Mock<IDbTransaction>();
@@ -54,9 +54,8 @@ namespace Kata.BusinessLogic.UnitTest.Services
                 .Returns((Func<IDbTransaction, IDbConnection, Task> operation) => operation(_mockTransaction.Object, _mockConnection.Object));
 
             _purchaseOrderService = new PurchaseOrderService(
-                _mockDataAccess.Object,
                 _mockPurchaseOrderRepository.Object,
-                _mockOrderItemService.Object,
+                _mockOrderItemRepository.Object,
                 _mockShippingSlipService.Object,
                 _mockProductProcessors,
                 _mockTransactionHandler.Object);
@@ -72,7 +71,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
             var shippingSlips = new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = purchaseOrderId, RecipientAddress = "101 Elm Rd" } };
 
             _mockPurchaseOrderRepository.Setup(repo => repo.GetPurchaseOrderByIdAsync(purchaseOrderId)).ReturnsAsync(purchaseOrder);
-            _mockOrderItemService.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ReturnsAsync(orderItems);
+            _mockOrderItemRepository.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ReturnsAsync(orderItems);
             _mockShippingSlipService.Setup(service => service.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId)).ReturnsAsync(shippingSlips);
 
             // Act
@@ -96,9 +95,9 @@ namespace Kata.BusinessLogic.UnitTest.Services
             var shippingSlips2 = new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = 2, RecipientAddress = "101 Elm Rd" } };
 
             _mockPurchaseOrderRepository.Setup(repo => repo.GetAllPurchaseOrdersAsync()).ReturnsAsync(purchaseOrders);
-            _mockOrderItemService.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(1)).ReturnsAsync(orderItems1);
+            _mockOrderItemRepository.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(1)).ReturnsAsync(orderItems1);
             _mockShippingSlipService.Setup(service => service.GetShippingSlipsByPurchaseOrderIdAsync(1)).ReturnsAsync(shippingSlips1);
-            _mockOrderItemService.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(2)).ReturnsAsync(orderItems2);
+            _mockOrderItemRepository.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(2)).ReturnsAsync(orderItems2);
             _mockShippingSlipService.Setup(service => service.GetShippingSlipsByPurchaseOrderIdAsync(2)).ReturnsAsync(shippingSlips2);
 
             // Act
@@ -124,7 +123,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
             };
 
             _mockPurchaseOrderRepository.Setup(repo => repo.AddPurchaseOrderAsync(It.IsAny<PurchaseOrder>(), _mockTransaction.Object, _mockConnection.Object)).ReturnsAsync(1);
-            _mockOrderItemService.Setup(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object)).ReturnsAsync(1);
+            _mockOrderItemRepository.Setup(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object)).ReturnsAsync(1);
             _mockMembershipProductProcessor.Setup(p => p.ProcessProductAsync(It.IsAny<PurchaseOrder>(), It.IsAny<OrderItem>(), _mockConnection.Object, _mockTransaction.Object)).Returns(Task.CompletedTask);
 
             // Act
@@ -132,7 +131,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
 
             // Assert
             _mockPurchaseOrderRepository.Verify(repo => repo.AddPurchaseOrderAsync(It.IsAny<PurchaseOrder>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
-            _mockOrderItemService.Verify(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
+            _mockOrderItemRepository.Verify(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
             _mockMembershipProductProcessor.Verify(p => p.ProcessProductAsync(It.IsAny<PurchaseOrder>(), It.IsAny<OrderItem>(), _mockConnection.Object, _mockTransaction.Object), Times.Once);
             _mockShippableProductProcessor.Verify(p => p.ProcessProductAsync(It.IsAny<PurchaseOrder>(), It.IsAny<OrderItem>(), _mockConnection.Object, _mockTransaction.Object), Times.Never);
         }
@@ -150,7 +149,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
             };
 
             _mockPurchaseOrderRepository.Setup(repo => repo.AddPurchaseOrderAsync(It.IsAny<PurchaseOrder>(), _mockTransaction.Object, _mockConnection.Object)).ReturnsAsync(1);
-            _mockOrderItemService.Setup(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object)).ReturnsAsync(1);
+            _mockOrderItemRepository.Setup(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object)).ReturnsAsync(1);
             _mockShippableProductProcessor.Setup(p => p.ProcessProductAsync(It.IsAny<PurchaseOrder>(), It.IsAny<OrderItem>(), _mockConnection.Object, _mockTransaction.Object)).Returns(Task.CompletedTask);
 
             // Act
@@ -158,7 +157,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
 
             // Assert
             _mockPurchaseOrderRepository.Verify(repo => repo.AddPurchaseOrderAsync(It.IsAny<PurchaseOrder>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
-            _mockOrderItemService.Verify(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
+            _mockOrderItemRepository.Verify(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
             _mockShippableProductProcessor.Verify(p => p.ProcessProductAsync(It.IsAny<PurchaseOrder>(), It.IsAny<OrderItem>(), _mockConnection.Object, _mockTransaction.Object), Times.Once);
             _mockMembershipProductProcessor.Verify(p => p.ProcessProductAsync(It.IsAny<PurchaseOrder>(), It.IsAny<OrderItem>(), _mockConnection.Object, _mockTransaction.Object), Times.Never);
         }
@@ -178,8 +177,8 @@ namespace Kata.BusinessLogic.UnitTest.Services
 
             // Assert
             _mockPurchaseOrderRepository.Verify(repo => repo.UpdatePurchaseOrderAsync(purchaseOrder, _mockTransaction.Object, _mockConnection.Object), Times.Once);
-            _mockOrderItemService.Verify(service => service.DeleteOrderItemsByPurchaseOrderIdAsync(1, _mockTransaction.Object, _mockConnection.Object), Times.Once);
-            _mockOrderItemService.Verify(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
+            _mockOrderItemRepository.Verify(service => service.DeleteOrderItemsByPurchaseOrderIdAsync(1, _mockTransaction.Object, _mockConnection.Object), Times.Once);
+            _mockOrderItemRepository.Verify(service => service.AddOrderItemAsync(It.IsAny<OrderItem>(), _mockTransaction.Object, _mockConnection.Object), Times.Once);
         }
 
         [Fact]
@@ -192,7 +191,7 @@ namespace Kata.BusinessLogic.UnitTest.Services
             await _purchaseOrderService.DeletePurchaseOrderAsync(purchaseOrderId);
 
             // Assert
-            _mockOrderItemService.Verify(service => service.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, _mockTransaction.Object, _mockConnection.Object), Times.Once);
+            _mockOrderItemRepository.Verify(service => service.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, _mockTransaction.Object, _mockConnection.Object), Times.Once);
             _mockPurchaseOrderRepository.Verify(repo => repo.DeletePurchaseOrderAsync(purchaseOrderId, _mockTransaction.Object, _mockConnection.Object), Times.Once);
         }
     }

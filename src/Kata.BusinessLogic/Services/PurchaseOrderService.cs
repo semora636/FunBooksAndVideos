@@ -8,23 +8,20 @@ namespace Kata.BusinessLogic.Services
     public class PurchaseOrderService : IPurchaseOrderService
     {
         private readonly IPurchaseOrderRepository _purchaseOrderRepository;
-        private readonly IOrderItemService _orderItemService;
+        private readonly IOrderItemRepository _orderItemRepository;
         private readonly IShippingSlipService _shippingSlipService;
-        private readonly ISqlDataAccess _dataAccess;
         private readonly IEnumerable<IProductProcessor> _productProcessors;
         private readonly ITransactionHandler _transactionHandler;
 
         public PurchaseOrderService(
-            ISqlDataAccess dataAccess,
             IPurchaseOrderRepository purchaseOrderRepository,
-            IOrderItemService orderItemService,
+            IOrderItemRepository orderItemService,
             IShippingSlipService shippingSlipService,
             IEnumerable<IProductProcessor> productProcessors,
             ITransactionHandler transactionHandler)
         {
-            _dataAccess = dataAccess;
             _purchaseOrderRepository = purchaseOrderRepository;
-            _orderItemService = orderItemService;
+            _orderItemRepository = orderItemService;
             _shippingSlipService = shippingSlipService;
             _productProcessors = productProcessors;
             _transactionHandler = transactionHandler;
@@ -36,7 +33,7 @@ namespace Kata.BusinessLogic.Services
 
             if (purchaseOrder != null)
             {
-                purchaseOrder.Items = (await _orderItemService.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
+                purchaseOrder.Items = (await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
                 purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
             }
 
@@ -49,7 +46,7 @@ namespace Kata.BusinessLogic.Services
 
             foreach (var purchaseOrder in purchaseOrders)
             {
-                purchaseOrder.Items = (await _orderItemService.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId)).ToList();
+                purchaseOrder.Items = (await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId)).ToList();
                 purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId)).ToList();
             }
 
@@ -72,7 +69,7 @@ namespace Kata.BusinessLogic.Services
                         item.PurchaseOrderId = purchaseOrder.PurchaseOrderId;
 
                         // TODO: Add validation to make sure the product exists
-                        item.OrderItemId = await _orderItemService.AddOrderItemAsync(item, transaction, connection);
+                        item.OrderItemId = await _orderItemRepository.AddOrderItemAsync(item, transaction, connection);
 
                         var processor = _productProcessors.FirstOrDefault(p => p.ProductType == item.ProductType);
                         if (processor != null)
@@ -89,14 +86,14 @@ namespace Kata.BusinessLogic.Services
             await _transactionHandler.ExecuteTransactionAsync(async (transaction, connection) =>
             {
                 await _purchaseOrderRepository.UpdatePurchaseOrderAsync(purchaseOrder, transaction, connection);
-                await _orderItemService.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId, transaction, connection);
+                await _orderItemRepository.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrder.PurchaseOrderId, transaction, connection);
 
                 if (purchaseOrder.Items != null)
                 {
                     foreach (var item in purchaseOrder.Items)
                     {
                         item.PurchaseOrderId = purchaseOrder.PurchaseOrderId;
-                        item.OrderItemId = await _orderItemService.AddOrderItemAsync(item, transaction, connection);
+                        item.OrderItemId = await _orderItemRepository.AddOrderItemAsync(item, transaction, connection);
                     }
                 }
             });
@@ -106,7 +103,7 @@ namespace Kata.BusinessLogic.Services
         {
             await _transactionHandler.ExecuteTransactionAsync(async (transaction, connection) =>
             {
-                await _orderItemService.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, transaction, connection);
+                await _orderItemRepository.DeleteOrderItemsByPurchaseOrderIdAsync(purchaseOrderId, transaction, connection);
                 await _purchaseOrderRepository.DeletePurchaseOrderAsync(purchaseOrderId, transaction, connection);
 
             });
