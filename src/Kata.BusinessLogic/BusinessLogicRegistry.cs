@@ -1,4 +1,5 @@
 ﻿using Kata.BusinessLogic.Interfaces;
+using Kata.BusinessLogic.ProductProcessors;
 using Kata.BusinessLogic.Services;
 using Kata.DataAccess;
 using Kata.DataAccess.Interfaces;

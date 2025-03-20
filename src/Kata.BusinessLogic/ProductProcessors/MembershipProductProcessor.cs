@@ -3,7 +3,7 @@ using Kata.Domain.Entities;
 using Kata.Domain.Enums;
 using System.Data;
 
-namespace Kata.BusinessLogic.Services
+namespace Kata.BusinessLogic.ProductProcessors
 {
     public class MembershipProductProcessor : IProductProcessor
     {
