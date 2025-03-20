@@ -32,6 +32,9 @@ namespace Kata.BusinessLogic
             services.AddScoped<IMembershipRepository, MembershipRepository>();
             services.AddScoped<IShippingSlipRepository, ShippingSlipRepository>();
 
+            services.AddScoped<IProductProcessor, MembershipProductProcessor>();
+            services.AddScoped<IProductProcessor, ShippableProductProcessor>();
+
             return services;
         }
     }

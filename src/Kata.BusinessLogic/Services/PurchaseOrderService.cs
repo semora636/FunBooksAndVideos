@@ -10,22 +10,22 @@ namespace Kata.BusinessLogic.Services
     {
         private readonly IPurchaseOrderRepository _purchaseOrderRepository;
         private readonly IOrderItemService _orderItemService;
-        private readonly IMembershipService _membershipService;
         private readonly IShippingSlipService _shippingSlipService;
         private readonly ISqlDataAccess _dataAccess;
+        private readonly IEnumerable<IProductProcessor> _productProcessors;
 
         public PurchaseOrderService(
             ISqlDataAccess dataAccess,
             IPurchaseOrderRepository purchaseOrderRepository,
             IOrderItemService orderItemService,
-            IMembershipService membershipService,
-            IShippingSlipService shippingSlipService)
+            IShippingSlipService shippingSlipService,
+            IEnumerable<IProductProcessor> productProcessors)
         {
             _dataAccess = dataAccess;
             _purchaseOrderRepository = purchaseOrderRepository;
             _orderItemService = orderItemService;
-            _membershipService = membershipService;
             _shippingSlipService = shippingSlipService;
+            _productProcessors = productProcessors;
         }
 
         public async Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId)
@@ -72,15 +72,10 @@ namespace Kata.BusinessLogic.Services
                         // TODO: Add validation to make sure the product exists
                         item.OrderItemId = await _orderItemService.AddOrderItemAsync(item, transaction, connection);
 
-                        if (item.ProductType == Domain.Enums.ProductType.Membership)
+                        var processor = _productProcessors.FirstOrDefault(p => p.ProductType == item.ProductType);
+                        if (processor != null)
                         {
-                            // If the item is a membership product, we need to add it to Membership table
-                            await _membershipService.ActivateMembershipAsync(purchaseOrder, connection, transaction, item);
-                        }
-                        else if (item.ProductType == Domain.Enums.ProductType.Book)
-                        {
-                            // If the item is a phisical product, so we need to generate a shipping slip
-                            await _shippingSlipService.GenerateShippingSlipAsync(purchaseOrder, connection, transaction);
+                            await processor.ProcessProductAsync(purchaseOrder, item, connection, transaction);
                         }
                     }
                 }
