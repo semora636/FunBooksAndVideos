@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Kata.Presentation.Handlers.Customers
 {
-    public class GetCustomerByIdHandler : IRequestHandler<GetCustomerByIdRequest, Customer>
+    public class GetCustomerByIdHandler : IRequestHandler<GetCustomerByIdRequest, Customer?>
     {
         private readonly ICustomerService _customerService;
 
@@ -14,7 +14,7 @@ namespace Kata.Presentation.Handlers.Customers
             _customerService = customerService;
         }
 
-        public async Task<Customer> Handle(GetCustomerByIdRequest request, CancellationToken cancellationToken)
+        public async Task<Customer?> Handle(GetCustomerByIdRequest request, CancellationToken cancellationToken)
         {
             return await _customerService.GetCustomerByIdAsync(request.Id);
         }

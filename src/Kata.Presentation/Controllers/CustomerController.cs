@@ -14,14 +14,13 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly ILogger<CustomerController> _logger;
         private readonly IMediator _mediator;
-        private readonly IMembershipService _membershipService;
+        private readonly ILogger<CustomerController> _logger;
 
         public CustomerController(IMediator mediator, ILogger<CustomerController> logger)
         {
-            _logger = logger;
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -54,6 +53,11 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> AddCustomerAsync([FromBody] Customer customer)
         {
+            if (customer == null)
+            {
+                return BadRequest("Customer object is null.");
+            }
+
             await _mediator.Send(new AddCustomerRequest { Customer = customer });
             return CreatedAtAction(nameof(GetCustomerByIdAsync), new { id = customer.CustomerId }, customer);
         }
