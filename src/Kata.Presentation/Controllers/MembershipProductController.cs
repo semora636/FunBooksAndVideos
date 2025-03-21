@@ -1,5 +1,6 @@
-﻿using Kata.BusinessLogic.Interfaces;
-using Kata.Domain.Entities;
+﻿using Kata.Domain.Entities;
+using Kata.Presentation.Requests.MembershipProducts;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,26 +10,26 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class MembershipProductController : ControllerBase
     {
-        private readonly IMembershipProductService _membershipProductService;
+        private readonly IMediator _mediator;
         private readonly ILogger<MembershipProductController> _logger;
 
-        public MembershipProductController(IMembershipProductService membershipProductService, ILogger<MembershipProductController> logger)
+        public MembershipProductController(IMediator mediator, ILogger<MembershipProductController> logger)
         {
-            _membershipProductService = membershipProductService;
+            _mediator = mediator;
             _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MembershipProduct>>> GetAllMembershipProductsAsync()
         {
-            var membershipProducts = await _membershipProductService.GetAllMembershipProductsAsync();
+            var membershipProducts = await _mediator.Send(new GetAllMembershipProductsRequest());
             return Ok(membershipProducts);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<MembershipProduct>> GetMembershipProductByIdAsync(int id)
         {
-            var membershipProduct = await _membershipProductService.GetMembershipProductByIdAsync(id);
+            var membershipProduct = await _mediator.Send(new GetMembershipProductByIdRequest { Id = id });
 
             if (membershipProduct == null)
             {
@@ -42,7 +43,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<MembershipProduct>> AddMembershipProductAsync([FromBody] MembershipProduct membershipProduct)
         {
-            await _membershipProductService.AddMembershipProductAsync(membershipProduct);
+            await _mediator.Send(new AddMembershipProductRequest { MembershipProduct = membershipProduct });
             return CreatedAtAction(nameof(GetMembershipProductByIdAsync), new { id = membershipProduct.MembershipProductId }, membershipProduct);
         }
 
@@ -55,7 +56,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("MembershipProductId in the request body must match the id in the URL.");
             }
 
-            await _membershipProductService.UpdateMembershipProductAsync(membershipProduct);
+            await _mediator.Send(new UpdateMembershipProductRequest { Id = id, MembershipProduct = membershipProduct });
             return NoContent();
         }
 
@@ -63,7 +64,7 @@ namespace Kata.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMembershipProductAsync(int id)
         {
-            await _membershipProductService.DeleteMembershipProductAsync(id);
+            await _mediator.Send(new DeleteMembershipProductRequest { Id = id });
             return NoContent();
         }
     }

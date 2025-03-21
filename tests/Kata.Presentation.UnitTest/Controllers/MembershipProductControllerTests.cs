@@ -1,7 +1,9 @@
-﻿using Kata.BusinessLogic.Interfaces;
-using Kata.Domain.Entities;
+﻿using Kata.Domain.Entities;
 using Kata.Domain.Enums;
 using Kata.Presentation.Controllers;
+using Kata.Presentation.Handlers.MembershipProducts;
+using Kata.Presentation.Requests.MembershipProducts;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,15 +12,15 @@ namespace Kata.Presentation.UnitTest.Controllers
 {
     public class MembershipProductControllerTests
     {
-        private readonly Mock<IMembershipProductService> _mockMembershipProductService;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<ILogger<MembershipProductController>> _mockLogger;
         private readonly MembershipProductController _controller;
 
         public MembershipProductControllerTests()
         {
-            _mockMembershipProductService = new Mock<IMembershipProductService>();
+            _mockMediator = new Mock<IMediator>();
             _mockLogger = new Mock<ILogger<MembershipProductController>>();
-            _controller = new MembershipProductController(_mockMembershipProductService.Object, _mockLogger.Object);
+            _controller = new MembershipProductController(_mockMediator.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -26,7 +28,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var membershipProducts = new List<MembershipProduct> { new MembershipProduct { MembershipProductId = 1, Name = "Premium Membership", MembershipType = MembershipType.Premium, Price = 99.99m, DurationMonths = 12 } };
-            _mockMembershipProductService.Setup(service => service.GetAllMembershipProductsAsync()).ReturnsAsync(membershipProducts);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetAllMembershipProductsRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(membershipProducts);
 
             // Act
             var result = await _controller.GetAllMembershipProductsAsync();
@@ -43,7 +45,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var membershipProductId = 1;
             var membershipProduct = new MembershipProduct { MembershipProductId = membershipProductId, Name = "Premium Membership", MembershipType = MembershipType.Premium, Price = 99.99m, DurationMonths = 12 };
-            _mockMembershipProductService.Setup(service => service.GetMembershipProductByIdAsync(membershipProductId)).ReturnsAsync(membershipProduct);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetMembershipProductByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(membershipProduct);
 
             // Act
             var result = await _controller.GetMembershipProductByIdAsync(membershipProductId);
@@ -59,7 +61,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var membershipProductId = 1;
-            _mockMembershipProductService.Setup(service => service.GetMembershipProductByIdAsync(membershipProductId)).ReturnsAsync(default(MembershipProduct));
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetMembershipProductByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(default(MembershipProduct));
 
             // Act
             var result = await _controller.GetMembershipProductByIdAsync(membershipProductId);
@@ -73,7 +75,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var membershipProduct = new MembershipProduct { Name = "Book Membership", MembershipType = MembershipType.BookClub, Price = 49.99m, DurationMonths = 6 };
-            _mockMembershipProductService.Setup(service => service.AddMembershipProductAsync(membershipProduct)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<AddMembershipProductHandler>(), It.IsAny<CancellationToken>())).ReturnsAsync(membershipProduct);
 
             // Act
             var result = await _controller.AddMembershipProductAsync(membershipProduct);
@@ -107,7 +109,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var membershipProductId = 1;
             var membershipProduct = new MembershipProduct { MembershipProductId = membershipProductId, Name = "Updated Premium Membership", MembershipType = MembershipType.Premium, Price = 109.99m, DurationMonths = 12 };
-            _mockMembershipProductService.Setup(service => service.UpdateMembershipProductAsync(membershipProduct)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<UpdateMembershipProductRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.UpdateMembershipProductAsync(membershipProductId, membershipProduct);
@@ -135,7 +137,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var membershipProductId = 1;
-            _mockMembershipProductService.Setup(service => service.DeleteMembershipProductAsync(membershipProductId)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<DeleteMembershipProductRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.DeleteMembershipProductAsync(membershipProductId);
