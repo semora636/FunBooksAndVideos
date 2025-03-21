@@ -1,5 +1,7 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
+using Kata.Presentation.Requests.Videos;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,26 +11,26 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class VideoController : ControllerBase
     {
-        private readonly IVideoService _videoService;
+        private readonly IMediator _mediator;
         private readonly ILogger<VideoController> _logger;
 
-        public VideoController(IVideoService videoService, ILogger<VideoController> logger)
+        public VideoController(IMediator mediator, ILogger<VideoController> logger)
         {
-            _videoService = videoService;
+            _mediator = mediator;
             _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Video>>> GetAllVideoAsync()
         {
-            var video =await _videoService.GetAllVideosAsync();
+            var video = await _mediator.Send(new GetAllVideosRequest());
             return Ok(video);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Video>> GetVideoByIdAsync(int id)
         {
-            var video = await _videoService.GetVideoByIdAsync(id);
+            var video = await _mediator.Send(new GetVideoByIdRequest { Id = id });
 
             if (video == null)
             {
@@ -42,7 +44,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<Video>> AddVideoAsync([FromBody] Video video)
         {
-            await _videoService.AddVideoAsync(video);
+            await _mediator.Send(new AddVideoRequest { Video = video });
             return CreatedAtAction(nameof(GetVideoByIdAsync), new { id = video.VideoId }, video);
         }
 
@@ -55,7 +57,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("VideoId in the request body must match the id in the URL.");
             }
 
-            await _videoService.UpdateVideoAsync(video);
+            await _mediator.Send(new UpdateVideoRequest { Video = video });
             return NoContent();
         }
 
@@ -63,7 +65,7 @@ namespace Kata.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVideoAsync(int id)
         {
-            await _videoService.DeleteVideoAsync(id);
+            await _mediator.Send(new DeleteVideoRequest { Id = id });
             return NoContent();
         }
     }

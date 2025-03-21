@@ -1,6 +1,8 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
 using Kata.Presentation.Controllers;
+using Kata.Presentation.Requests.Videos;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -9,15 +11,15 @@ namespace Kata.Presentation.UnitTest.Controllers
 {
     public class VideoControllerTests
     {
-        private readonly Mock<IVideoService> _mockVideoService;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<ILogger<VideoController>> _mockLogger;
         private readonly VideoController _controller;
 
         public VideoControllerTests()
         {
-            _mockVideoService = new Mock<IVideoService>();
+            _mockMediator = new Mock<IMediator>();
             _mockLogger = new Mock<ILogger<VideoController>>();
-            _controller = new VideoController(_mockVideoService.Object, _mockLogger.Object);
+            _controller = new VideoController(_mockMediator.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -25,7 +27,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var videos = new List<Video> { new Video { VideoId = 1, Name = "Movie 1", Price = 19.99m, Director = "Director 1" } };
-            _mockVideoService.Setup(service => service.GetAllVideosAsync()).ReturnsAsync(videos);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetAllVideosRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(videos);
 
             // Act
             var result = await _controller.GetAllVideoAsync();
@@ -42,7 +44,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var videoId = 1;
             var video = new Video { VideoId = videoId, Name = "Movie 1", Price = 19.99m, Director = "Director 1" };
-            _mockVideoService.Setup(service => service.GetVideoByIdAsync(videoId)).ReturnsAsync(video);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetVideoByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(video);
 
             // Act
             var result = await _controller.GetVideoByIdAsync(videoId);
@@ -58,7 +60,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var videoId = 1;
-            _mockVideoService.Setup(service => service.GetVideoByIdAsync(videoId)).ReturnsAsync(default(Video));
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetVideoByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(default(Video));
 
             // Act
             var result = await _controller.GetVideoByIdAsync(videoId);
@@ -72,7 +74,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var video = new Video { Name = "Movie 2", Price = 24.99m, Director = "Director 2" };
-            _mockVideoService.Setup(service => service.AddVideoAsync(video)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<AddVideoRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(video);
 
             // Act
             var result = await _controller.AddVideoAsync(video);
@@ -106,7 +108,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var videoId = 1;
             var video = new Video { VideoId = videoId, Name = "Updated Movie 1", Price = 29.99m, Director = "Updated Director 1" };
-            _mockVideoService.Setup(service => service.UpdateVideoAsync(video)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<UpdateVideoRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.UpdateVideoAsync(videoId, video);
@@ -134,7 +136,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var videoId = 1;
-            _mockVideoService.Setup(service => service.DeleteVideoAsync(videoId)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<DeleteVideoRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.DeleteVideoAsync(videoId);
