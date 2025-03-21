@@ -1,6 +1,8 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
 using Kata.Presentation.Controllers;
+using Kata.Presentation.Requests.PurchaseOrders;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -9,15 +11,15 @@ namespace Kata.Presentation.UnitTest.Controllers
 {
     public class PurchaseOrderControllerTests
     {
-        private readonly Mock<IPurchaseOrderService> _mockPurchaseOrderService;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<ILogger<PurchaseOrderController>> _mockLogger;
         private readonly PurchaseOrderController _controller;
 
         public PurchaseOrderControllerTests()
         {
-            _mockPurchaseOrderService = new Mock<IPurchaseOrderService>();
+            _mockMediator = new Mock<IMediator>();
             _mockLogger = new Mock<ILogger<PurchaseOrderController>>();
-            _controller = new PurchaseOrderController(_mockPurchaseOrderService.Object, _mockLogger.Object);
+            _controller = new PurchaseOrderController(_mockMediator.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -25,7 +27,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var purchaseOrders = new List<PurchaseOrder> { new PurchaseOrder { PurchaseOrderId = 1, CustomerId = 1, OrderDateTime = DateTime.Now, TotalPrice = 100.00m } };
-            _mockPurchaseOrderService.Setup(service => service.GetAllPurchaseOrdersAsync()).ReturnsAsync(purchaseOrders);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetAllPurchaseOrdersRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(purchaseOrders);
 
             // Act
             var result = await _controller.GetAllPurchaseOrdersAsync();
@@ -42,7 +44,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var purchaseOrderId = 1;
             var purchaseOrder = new PurchaseOrder { PurchaseOrderId = purchaseOrderId, CustomerId = 1, OrderDateTime = DateTime.Now, TotalPrice = 100.00m };
-            _mockPurchaseOrderService.Setup(service => service.GetPurchaseOrderByIdAsync(purchaseOrderId)).ReturnsAsync(purchaseOrder);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetPurchaseOrderByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(purchaseOrder);
 
             // Act
             var result = await _controller.GetPurchaseOrderByIdAsync(purchaseOrderId);
@@ -58,7 +60,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var purchaseOrderId = 1;
-            _mockPurchaseOrderService.Setup(service => service.GetPurchaseOrderByIdAsync(purchaseOrderId)).ReturnsAsync(default(PurchaseOrder));
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetPurchaseOrderByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(default(PurchaseOrder));
 
             // Act
             var result = await _controller.GetPurchaseOrderByIdAsync(purchaseOrderId);
@@ -72,7 +74,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var purchaseOrder = new PurchaseOrder { CustomerId = 1, OrderDateTime = DateTime.Now, TotalPrice = 50.00m };
-            _mockPurchaseOrderService.Setup(service => service.AddPurchaseOrderAsync(purchaseOrder)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<AddPurchaseOrderRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(purchaseOrder);
 
             // Act
             var result = await _controller.AddPurchaseOrderAsync(purchaseOrder);
@@ -106,7 +108,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var purchaseOrderId = 1;
             var purchaseOrder = new PurchaseOrder { PurchaseOrderId = purchaseOrderId, CustomerId = 2, OrderDateTime = DateTime.Now.AddDays(1), TotalPrice = 120.00m };
-            _mockPurchaseOrderService.Setup(service => service.UpdatePurchaseOrderAsync(purchaseOrder)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<UpdatePurchaseOrderRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.UpdatePurchaseOrderAsync(purchaseOrderId, purchaseOrder);
@@ -134,7 +136,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var purchaseOrderId = 1;
-            _mockPurchaseOrderService.Setup(service => service.DeletePurchaseOrderAsync(purchaseOrderId)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<DeletePurchaseOrderRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.DeletePurchaseOrderAsync(purchaseOrderId);

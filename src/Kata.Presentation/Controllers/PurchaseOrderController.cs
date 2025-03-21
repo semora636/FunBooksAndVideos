@@ -1,5 +1,7 @@
 ﻿using Kata.BusinessLogic.Interfaces;
 using Kata.Domain.Entities;
+using Kata.Presentation.Requests.PurchaseOrders;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,26 +12,26 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class PurchaseOrderController : ControllerBase
     {
-        private readonly IPurchaseOrderService _purchaseOrderService;
+        private readonly IMediator _mediator;
         private readonly ILogger<PurchaseOrderController> _logger;
 
-        public PurchaseOrderController(IPurchaseOrderService purchaseOrderService, ILogger<PurchaseOrderController> logger)
+        public PurchaseOrderController(IMediator mediator, ILogger<PurchaseOrderController> logger)
         {
-            _purchaseOrderService = purchaseOrderService;
+            _mediator = mediator;
             _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PurchaseOrder>>> GetAllPurchaseOrdersAsync()
         {
-            var purchaseOrders = await _purchaseOrderService.GetAllPurchaseOrdersAsync();
+            var purchaseOrders = await _mediator.Send(new GetAllPurchaseOrdersRequest());
             return Ok(purchaseOrders);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PurchaseOrder>> GetPurchaseOrderByIdAsync(int id)
         {
-            var purchaseOrder = await _purchaseOrderService.GetPurchaseOrderByIdAsync(id);
+            var purchaseOrder = await _mediator.Send(new GetPurchaseOrderByIdRequest { Id = id });
 
             if (purchaseOrder == null)
             {
@@ -42,7 +44,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<PurchaseOrder>> AddPurchaseOrderAsync([FromBody] PurchaseOrder purchaseOrder)
         {
-            await _purchaseOrderService.AddPurchaseOrderAsync(purchaseOrder);
+            await _mediator.Send(new AddPurchaseOrderRequest { PurchaseOrder = purchaseOrder });
             return CreatedAtAction(nameof(GetPurchaseOrderByIdAsync), new { id = purchaseOrder.PurchaseOrderId }, purchaseOrder);
         }
 
@@ -54,14 +56,14 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("PurchaseOrderId in the request body must match the ID in the URL.");
             }
 
-            await _purchaseOrderService.UpdatePurchaseOrderAsync(purchaseOrder);
+            await _mediator.Send(new UpdatePurchaseOrderRequest { PurchaseOrder = purchaseOrder });
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePurchaseOrderAsync(int id)
         {
-            await _purchaseOrderService.DeletePurchaseOrderAsync(id);
+            await _mediator.Send(new DeletePurchaseOrderRequest { Id = id });
             return NoContent();
         }
     }
