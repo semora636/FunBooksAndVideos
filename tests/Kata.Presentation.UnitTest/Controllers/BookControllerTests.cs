@@ -1,6 +1,7 @@
-﻿using Kata.BusinessLogic.Interfaces;
-using Kata.Domain.Entities;
+﻿using Kata.Domain.Entities;
 using Kata.Presentation.Controllers;
+using Kata.Presentation.Requests.Books;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -9,15 +10,15 @@ namespace Kata.Presentation.UnitTest.Controllers
 {
     public class BookControllerTests
     {
-        private readonly Mock<IBookService> _mockBookService;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<ILogger<BookController>> _mockLogger;
         private readonly BookController _controller;
 
         public BookControllerTests()
         {
-            _mockBookService = new Mock<IBookService>();
+            _mockMediator = new Mock<IMediator>();
             _mockLogger = new Mock<ILogger<BookController>>();
-            _controller = new BookController(_mockBookService.Object, _mockLogger.Object);
+            _controller = new BookController(_mockMediator.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -25,7 +26,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var books = new List<Book> { new Book { Name = "Test Book" } };
-            _mockBookService.Setup(service => service.GetAllBooksAsync()).ReturnsAsync(books);
+            _mockMediator.Setup(m => m.Send(It.IsAny<GetAllBooksRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(books);
 
             // Act
             var result = await _controller.GetAllBooksAsync();
@@ -42,7 +43,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var bookId = 1;
             var book = new Book { BookId = bookId, Name = "Test Book" };
-            _mockBookService.Setup(service => service.GetBookByIdAsync(bookId)).ReturnsAsync(book);
+            _mockMediator.Setup(m => m.Send(It.IsAny<GetBookByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(book);
 
             // Act
             var result = await _controller.GetBookByIdAsync(bookId);
@@ -58,7 +59,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var bookId = 1;
-            _mockBookService.Setup(service => service.GetBookByIdAsync(bookId)).ReturnsAsync(default(Book));
+            _mockMediator.Setup(m => m.Send(It.IsAny<GetBookByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(default(Book?));
 
             // Act
             var result = await _controller.GetBookByIdAsync(bookId);
@@ -72,7 +73,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var book = new Book { Name = "New Book" };
-            _mockBookService.Setup(service => service.AddBookAsync(book)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(m => m.Send(It.IsAny<AddBookRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(book);
 
             // Act
             var result = await _controller.AddBookAsync(book);
@@ -105,7 +106,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var bookId = 1;
             var book = new Book { BookId = bookId, Name = "Updated Book" };
-            _mockBookService.Setup(service => service.UpdateBookAsync(book)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(m => m.Send(It.IsAny<UpdateBookRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.UpdateBookAsync(bookId, book);
@@ -133,7 +134,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var bookId = 1;
-            _mockBookService.Setup(service => service.DeleteBookAsync(bookId)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(m => m.Send(It.IsAny<DeleteBookRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.DeleteBookAsync(bookId);

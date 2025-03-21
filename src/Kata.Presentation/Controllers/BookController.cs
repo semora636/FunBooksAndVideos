@@ -1,5 +1,6 @@
-﻿using Kata.BusinessLogic.Interfaces;
-using Kata.Domain.Entities;
+﻿using Kata.Domain.Entities;
+using Kata.Presentation.Requests.Books;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,26 +10,26 @@ namespace Kata.Presentation.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly IBookService _bookService;
+        private readonly IMediator _mediator;
         private readonly ILogger<BookController> _logger;
 
-        public BookController(IBookService bookService, ILogger<BookController> logger)
+        public BookController(IMediator mediator, ILogger<BookController> logger)
         {
-            _bookService = bookService;
+            _mediator = mediator;
             _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetAllBooksAsync()
         {
-            var books = await _bookService.GetAllBooksAsync();
+            var books = await _mediator.Send(new GetAllBooksRequest());
             return Ok(books);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBookByIdAsync(int id)
         {
-            var book = await _bookService.GetBookByIdAsync(id);
+            var book = await _mediator.Send(new GetBookByIdRequest { Id = id });
 
             if (book == null)
             {
@@ -42,7 +43,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> AddBookAsync([FromBody] Book book)
         {
-            await _bookService.AddBookAsync(book);
+            await _mediator.Send(new AddBookRequest { Book = book });
             return CreatedAtAction(nameof(GetBookByIdAsync), new { id = book.BookId }, book);
         }
 
@@ -55,7 +56,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("BookId in the request body must match the id in the URL.");
             }
 
-            await _bookService.UpdateBookAsync(book);
+            await _mediator.Send(new UpdateBookRequest { Id = id, Book = book });
             return NoContent();
         }
 
@@ -63,7 +64,7 @@ namespace Kata.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBookAsync(int id)
         {
-            await _bookService.DeleteBookAsync(id);
+            await _mediator.Send(new DeleteBookRequest { Id = id });
             return NoContent();
         }
     }
