@@ -5,7 +5,11 @@ namespace Kata.Presentation.Requests.Books
 {
     public class UpdateBookRequest : IRequest
     {
-        public int Id { get; set; }
         public Book Book { get; set; }
+
+        public UpdateBookRequest(Book book)
+        {
+            Book = book;
+        }
     }
 }

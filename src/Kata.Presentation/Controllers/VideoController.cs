@@ -44,7 +44,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<Video>> AddVideoAsync([FromBody] Video video)
         {
-            await _mediator.Send(new AddVideoRequest { Video = video });
+            await _mediator.Send(new AddVideoRequest(video));
             return CreatedAtAction(nameof(GetVideoByIdAsync), new { id = video.VideoId }, video);
         }
 
@@ -57,7 +57,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("VideoId in the request body must match the id in the URL.");
             }
 
-            await _mediator.Send(new UpdateVideoRequest { Video = video });
+            await _mediator.Send(new UpdateVideoRequest(video));
             return NoContent();
         }
 

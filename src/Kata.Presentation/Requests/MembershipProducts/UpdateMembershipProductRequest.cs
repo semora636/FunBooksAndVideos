@@ -5,7 +5,11 @@ namespace Kata.Presentation.Requests.MembershipProducts
 {
     public class UpdateMembershipProductRequest : IRequest
     {
-        public int Id { get; set; }
         public MembershipProduct MembershipProduct { get; set; }
+
+        public UpdateMembershipProductRequest(MembershipProduct membershipProduct)
+        {
+            MembershipProduct = membershipProduct;
+        }
     }
 }

@@ -5,7 +5,11 @@ namespace Kata.Presentation.Requests.Videos
 {
     public class UpdateVideoRequest : IRequest
     {
-        public int Id { get; set; }
         public Video Video { get; set; }
+
+        public UpdateVideoRequest(Video video)
+        {
+            Video = video;
+        }
     }
 }

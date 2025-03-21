@@ -44,7 +44,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<PurchaseOrder>> AddPurchaseOrderAsync([FromBody] PurchaseOrder purchaseOrder)
         {
-            await _mediator.Send(new AddPurchaseOrderRequest { PurchaseOrder = purchaseOrder });
+            await _mediator.Send(new AddPurchaseOrderRequest(purchaseOrder));
             return CreatedAtAction(nameof(GetPurchaseOrderByIdAsync), new { id = purchaseOrder.PurchaseOrderId }, purchaseOrder);
         }
 
@@ -56,7 +56,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("PurchaseOrderId in the request body must match the ID in the URL.");
             }
 
-            await _mediator.Send(new UpdatePurchaseOrderRequest { PurchaseOrder = purchaseOrder });
+            await _mediator.Send(new UpdatePurchaseOrderRequest(purchaseOrder));
             return NoContent();
         }
 

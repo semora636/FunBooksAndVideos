@@ -5,7 +5,11 @@ namespace Kata.Presentation.Requests.Customers
 {
     public class UpdateCustomerRequest : IRequest
     {
-        public int Id { get; set; }
         public Customer Customer { get; set; }
+
+        public UpdateCustomerRequest(Customer customer)
+        {
+            Customer = customer;
+        }
     }
 }

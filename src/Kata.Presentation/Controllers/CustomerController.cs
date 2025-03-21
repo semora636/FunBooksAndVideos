@@ -58,7 +58,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("Customer object is null.");
             }
 
-            await _mediator.Send(new AddCustomerRequest { Customer = customer });
+            await _mediator.Send(new AddCustomerRequest(customer));
             return CreatedAtAction(nameof(GetCustomerByIdAsync), new { id = customer.CustomerId }, customer);
         }
 
@@ -70,7 +70,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("CustomerId in the request body must match the ID in the URL.");
             }
 
-            await _mediator.Send(new UpdateCustomerRequest { Customer = customer });
+            await _mediator.Send(new UpdateCustomerRequest(customer));
             return NoContent();
         }
 

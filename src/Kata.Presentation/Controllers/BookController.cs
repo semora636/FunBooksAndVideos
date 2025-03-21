@@ -43,7 +43,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> AddBookAsync([FromBody] Book book)
         {
-            await _mediator.Send(new AddBookRequest { Book = book });
+            await _mediator.Send(new AddBookRequest(book));
             return CreatedAtAction(nameof(GetBookByIdAsync), new { id = book.BookId }, book);
         }
 
@@ -56,7 +56,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("BookId in the request body must match the id in the URL.");
             }
 
-            await _mediator.Send(new UpdateBookRequest { Id = id, Book = book });
+            await _mediator.Send(new UpdateBookRequest(book));
             return NoContent();
         }
 

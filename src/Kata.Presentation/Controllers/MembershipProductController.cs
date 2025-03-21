@@ -43,7 +43,7 @@ namespace Kata.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<MembershipProduct>> AddMembershipProductAsync([FromBody] MembershipProduct membershipProduct)
         {
-            await _mediator.Send(new AddMembershipProductRequest { MembershipProduct = membershipProduct });
+            await _mediator.Send(new AddMembershipProductRequest(membershipProduct));
             return CreatedAtAction(nameof(GetMembershipProductByIdAsync), new { id = membershipProduct.MembershipProductId }, membershipProduct);
         }
 
@@ -56,7 +56,7 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("MembershipProductId in the request body must match the id in the URL.");
             }
 
-            await _mediator.Send(new UpdateMembershipProductRequest { Id = id, MembershipProduct = membershipProduct });
+            await _mediator.Send(new UpdateMembershipProductRequest(membershipProduct));
             return NoContent();
         }
 

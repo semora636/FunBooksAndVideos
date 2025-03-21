@@ -5,7 +5,11 @@ namespace Kata.Presentation.Requests.PurchaseOrders
 {
     public class UpdatePurchaseOrderRequest : IRequest
     {
-        public int Id { get; set; }
         public PurchaseOrder PurchaseOrder { get; set; }
+
+        public UpdatePurchaseOrderRequest(PurchaseOrder purchaseOrder)
+        {
+            PurchaseOrder = purchaseOrder;
+        }
     }
 }

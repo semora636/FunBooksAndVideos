@@ -6,5 +6,10 @@ namespace Kata.Presentation.Requests.MembershipProducts
     public class AddMembershipProductRequest : IRequest<MembershipProduct>
     {
         public MembershipProduct MembershipProduct { get; set; }
+
+        public AddMembershipProductRequest(MembershipProduct membershipProduct)
+        {
+            MembershipProduct = membershipProduct;
+        }
     }
 }
