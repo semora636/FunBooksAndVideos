@@ -15,6 +15,7 @@ namespace Kata.Presentation.Handlers.Books
 
         public async Task Handle(DeleteBookRequest request, CancellationToken cancellationToken)
         {
+            _ = await _bookService.GetBookByIdAsync(request.Id) ?? throw new KeyNotFoundException($"Book with ID {request.Id} not found.");
             await _bookService.DeleteBookAsync(request.Id);
         }
     }

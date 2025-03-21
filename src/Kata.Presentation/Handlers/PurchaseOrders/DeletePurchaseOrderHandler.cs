@@ -15,6 +15,7 @@ namespace Kata.Presentation.Handlers.PurchaseOrders
 
         public async Task Handle(DeletePurchaseOrderRequest request, CancellationToken cancellationToken)
         {
+            _ = await _purchaseOrderService.GetPurchaseOrderByIdAsync(request.Id) ?? throw new KeyNotFoundException($"PurchaseOrder with ID {request.Id} not found.");
             await _purchaseOrderService.DeletePurchaseOrderAsync(request.Id);
         }
     }

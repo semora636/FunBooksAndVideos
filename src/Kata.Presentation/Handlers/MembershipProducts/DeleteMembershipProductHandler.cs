@@ -15,6 +15,7 @@ namespace Kata.Presentation.Handlers.MembershipProducts
 
         public async Task Handle(DeleteMembershipProductRequest request, CancellationToken cancellationToken)
         {
+            _ = await _membershipProductService.GetMembershipProductByIdAsync(request.Id) ?? throw new KeyNotFoundException($"MembershipProduct with ID {request.Id} not found.");
             await _membershipProductService.DeleteMembershipProductAsync(request.Id);
         }
     }

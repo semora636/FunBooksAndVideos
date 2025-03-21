@@ -15,6 +15,7 @@ namespace Kata.Presentation.Handlers.Videos
 
         public async Task Handle(DeleteVideoRequest request, CancellationToken cancellationToken)
         {
+            _ = await _videoService.GetVideoByIdAsync(request.Id) ?? throw new KeyNotFoundException($"Video with ID {request.Id} not found.");
             await _videoService.DeleteVideoAsync(request.Id);
         }
     }

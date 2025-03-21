@@ -29,11 +29,20 @@ namespace Kata.Presentation.Middlewares
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            switch (exception)
+            {
+                case KeyNotFoundException _:
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    break;
+                default:
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    break;
+            }
 
             var error = new
             {
-                Message = "An unexpected error occurred.",
+                Message = "An error occurred.",
                 Details = exception.Message
             };
 

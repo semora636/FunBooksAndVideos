@@ -15,6 +15,7 @@ namespace Kata.Presentation.Handlers.Customers
 
         public async Task Handle(DeleteCustomerRequest request, CancellationToken cancellationToken)
         {
+            _ = await _customerService.GetCustomerByIdAsync(request.Id) ?? throw new KeyNotFoundException($"Customer with ID {request.Id} not found.");
             await _customerService.DeleteCustomerAsync(request.Id);
         }
     }
