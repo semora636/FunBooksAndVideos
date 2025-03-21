@@ -2,6 +2,8 @@
 using Kata.Domain.Entities;
 using Kata.Domain.Enums;
 using Kata.Presentation.Controllers;
+using Kata.Presentation.Requests.Customers;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,17 +12,15 @@ namespace Kata.Presentation.UnitTest.Controllers
 {
     public class CustomerControllerTests
     {
-        private readonly Mock<ICustomerService> _mockCustomerService;
-        private readonly Mock<IMembershipService> _mockMembershipService;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<ILogger<CustomerController>> _mockLogger;
         private readonly CustomerController _controller;
 
         public CustomerControllerTests()
         {
-            _mockCustomerService = new Mock<ICustomerService>();
-            _mockMembershipService = new Mock<IMembershipService>();
+            _mockMediator = new Mock<IMediator>();
             _mockLogger = new Mock<ILogger<CustomerController>>();
-            _controller = new CustomerController(_mockLogger.Object, _mockCustomerService.Object, _mockMembershipService.Object);
+            _controller = new CustomerController(_mockMediator.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var customers = new List<Customer> { new Customer { CustomerId = 1, FirstName = "John", LastName = "Doe", EmailAddress = "john.doe@example.com", Address = "123 Main St" } };
-            _mockCustomerService.Setup(service => service.GetAllCustomersAsync()).ReturnsAsync(customers);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetAllCustomersRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(customers);
 
             // Act
             var result = await _controller.GetAllCustomersAsync();
@@ -45,7 +45,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var customerId = 1;
             var customer = new Customer { CustomerId = customerId, FirstName = "John", LastName = "Doe", EmailAddress = "john.doe@example.com", Address = "123 Main St" };
-            _mockCustomerService.Setup(service => service.GetCustomerByIdAsync(customerId)).ReturnsAsync(customer);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetCustomerByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(customer);
 
             // Act
             var result = await _controller.GetCustomerByIdAsync(customerId);
@@ -61,7 +61,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var customerId = 1;
-            _mockCustomerService.Setup(service => service.GetCustomerByIdAsync(customerId)).ReturnsAsync(default(Customer));
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetCustomerByIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(default(Customer));
 
             // Act
             var result = await _controller.GetCustomerByIdAsync(customerId);
@@ -76,7 +76,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var customerId = 1;
             var memberships = new List<Membership> { new Membership { MembershipId = 1, CustomerId = customerId, MembershipType = MembershipType.Premium, ActivationDateTime = DateTime.Now, ExpirationDateTime = DateTime.Now.AddMonths(1) } };
-            _mockMembershipService.Setup(service => service.GetMembershipsByCustomerIdAsync(customerId)).ReturnsAsync(memberships);
+            _mockMediator.Setup(service => service.Send(It.IsAny<GetMembershipsByCustomerIdRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(memberships);
 
             // Act
             var result = await _controller.GetMembershipsByCustomerIdAsync(customerId);
@@ -92,7 +92,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var customer = new Customer { FirstName = "Jane", LastName = "Smith", EmailAddress = "jane.smith@example.com", Address = "456 Oak Ave" };
-            _mockCustomerService.Setup(service => service.AddCustomerAsync(customer)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<AddCustomerRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(customer);
 
             // Act
             var result = await _controller.AddCustomerAsync(customer);
@@ -126,7 +126,7 @@ namespace Kata.Presentation.UnitTest.Controllers
             // Arrange
             var customerId = 1;
             var customer = new Customer { CustomerId = customerId, FirstName = "Updated John", LastName = "Updated Doe", EmailAddress = "updated.john.doe@example.com", Address = "Updated 123 Main St" };
-            _mockCustomerService.Setup(service => service.UpdateCustomerAsync(customer)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<UpdateCustomerRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.UpdateCustomerAsync(customerId, customer);
@@ -154,7 +154,7 @@ namespace Kata.Presentation.UnitTest.Controllers
         {
             // Arrange
             var customerId = 1;
-            _mockCustomerService.Setup(service => service.DeleteCustomerAsync(customerId)).Returns(Task.CompletedTask);
+            _mockMediator.Setup(service => service.Send(It.IsAny<DeleteCustomerRequest>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.DeleteCustomer(customerId);

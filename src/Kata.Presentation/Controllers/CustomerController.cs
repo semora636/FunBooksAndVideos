@@ -1,5 +1,9 @@
 ﻿using Kata.BusinessLogic.Interfaces;
+using Kata.BusinessLogic.Services;
 using Kata.Domain.Entities;
+using Kata.Presentation.Handlers.Customers;
+using Kata.Presentation.Requests.Customers;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,27 +15,26 @@ namespace Kata.Presentation.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
-        private readonly ICustomerService _customerService;
+        private readonly IMediator _mediator;
         private readonly IMembershipService _membershipService;
 
-        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService, IMembershipService membershipService)
+        public CustomerController(IMediator mediator, ILogger<CustomerController> logger)
         {
             _logger = logger;
-            _customerService = customerService;
-            _membershipService = membershipService;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetAllCustomersAsync()
         {
-            var customers = await _customerService.GetAllCustomersAsync();
+            var customers = await _mediator.Send(new GetAllCustomersRequest());
             return Ok(customers);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomerByIdAsync(int id)
         {
-            var customer = await _customerService.GetCustomerByIdAsync(id);
+            var customer = await _mediator.Send(new GetCustomerByIdRequest { Id = id });
 
             if (customer == null)
             {
@@ -44,14 +47,14 @@ namespace Kata.Presentation.Controllers
         [HttpGet("{id}/memberships")]
         public async Task<ActionResult<IEnumerable<Membership>>> GetMembershipsByCustomerIdAsync(int id)
         {
-            var memberships = await _membershipService.GetMembershipsByCustomerIdAsync(id);
+            var memberships = await _mediator.Send(new GetMembershipsByCustomerIdRequest { Id = id });
             return Ok(memberships);
         }
 
         [HttpPost]
         public async Task<ActionResult<Customer>> AddCustomerAsync([FromBody] Customer customer)
         {
-            await _customerService.AddCustomerAsync(customer);
+            await _mediator.Send(new AddCustomerRequest { Customer = customer });
             return CreatedAtAction(nameof(GetCustomerByIdAsync), new { id = customer.CustomerId }, customer);
         }
 
@@ -63,14 +66,14 @@ namespace Kata.Presentation.Controllers
                 return BadRequest("CustomerId in the request body must match the ID in the URL.");
             }
 
-            await _customerService.UpdateCustomerAsync(customer);
+            await _mediator.Send(new UpdateCustomerRequest { Customer = customer });
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            await _customerService.DeleteCustomerAsync(id);
+            await _mediator.Send(new DeleteCustomerRequest { Id = id });
             return NoContent();
         }
     }
