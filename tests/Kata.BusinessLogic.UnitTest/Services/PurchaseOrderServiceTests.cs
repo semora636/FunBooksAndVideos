@@ -67,12 +67,10 @@ namespace Kata.BusinessLogic.UnitTest.Services
             // Arrange
             int purchaseOrderId = 1;
             var purchaseOrder = new PurchaseOrder { PurchaseOrderId = purchaseOrderId };
-            var orderItems = new List<OrderItem> { new OrderItem { PurchaseOrderId = purchaseOrderId } };
-            var shippingSlips = new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = purchaseOrderId, RecipientAddress = "101 Elm Rd" } };
+            purchaseOrder.Items = new List<OrderItem> { new OrderItem { PurchaseOrderId = purchaseOrderId } };
+            purchaseOrder.ShippingSlips = new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = purchaseOrderId, RecipientAddress = "101 Elm Rd" } };
 
-            _mockPurchaseOrderRepository.Setup(repo => repo.GetPurchaseOrderByIdAsync(purchaseOrderId)).ReturnsAsync(purchaseOrder);
-            _mockOrderItemRepository.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ReturnsAsync(orderItems);
-            _mockShippingSlipService.Setup(service => service.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId)).ReturnsAsync(shippingSlips);
+            _mockPurchaseOrderRepository.Setup(repo => repo.GetPurchaseOrderWithItemsAndSlipByIdAsync(purchaseOrderId)).ReturnsAsync(purchaseOrder);
 
             // Act
             var result = await _purchaseOrderService.GetPurchaseOrderByIdAsync(purchaseOrderId);
@@ -80,8 +78,8 @@ namespace Kata.BusinessLogic.UnitTest.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(purchaseOrderId, result.PurchaseOrderId);
-            Assert.Equal(orderItems, result.Items);
-            Assert.Equal(shippingSlips, result.ShippingSlips);
+            Assert.Equal(purchaseOrder.Items, result.Items);
+            Assert.Equal(purchaseOrder.ShippingSlips, result.ShippingSlips);
         }
 
         [Fact]
@@ -89,26 +87,22 @@ namespace Kata.BusinessLogic.UnitTest.Services
         {
             // Arrange
             var purchaseOrders = new List<PurchaseOrder> { new PurchaseOrder { PurchaseOrderId = 1 }, new PurchaseOrder { PurchaseOrderId = 2 } };
-            var orderItems1 = new List<OrderItem> { new OrderItem { PurchaseOrderId = 1 } };
-            var shippingSlips1 = new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = 1, RecipientAddress = "101 Elm Rd" } };
-            var orderItems2 = new List<OrderItem> { new OrderItem { PurchaseOrderId = 2 } };
-            var shippingSlips2 = new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = 2, RecipientAddress = "101 Elm Rd" } };
+            purchaseOrders[0].Items = new List<OrderItem> { new OrderItem { PurchaseOrderId = 1 } };
+            purchaseOrders[0].ShippingSlips = new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = 1, RecipientAddress = "101 Elm Rd" } };
+            purchaseOrders[1].Items = new List<OrderItem> { new OrderItem { PurchaseOrderId = 2 } };
+            purchaseOrders[1].ShippingSlips= new List<ShippingSlip> { new ShippingSlip { PurchaseOrderId = 2, RecipientAddress = "101 Elm Rd" } };
 
-            _mockPurchaseOrderRepository.Setup(repo => repo.GetAllPurchaseOrdersAsync()).ReturnsAsync(purchaseOrders);
-            _mockOrderItemRepository.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(1)).ReturnsAsync(orderItems1);
-            _mockShippingSlipService.Setup(service => service.GetShippingSlipsByPurchaseOrderIdAsync(1)).ReturnsAsync(shippingSlips1);
-            _mockOrderItemRepository.Setup(service => service.GetOrderItemsByPurchaseOrderIdAsync(2)).ReturnsAsync(orderItems2);
-            _mockShippingSlipService.Setup(service => service.GetShippingSlipsByPurchaseOrderIdAsync(2)).ReturnsAsync(shippingSlips2);
+            _mockPurchaseOrderRepository.Setup(repo => repo.GetAllPurchaseOrdersWithItemsAndSlipsAsync()).ReturnsAsync(purchaseOrders);
 
             // Act
             var result = await _purchaseOrderService.GetAllPurchaseOrdersAsync();
 
             // Assert
             Assert.Equal(purchaseOrders.Count, result.Count());
-            Assert.Equal(orderItems1, result.First().Items);
-            Assert.Equal(shippingSlips1, result.First().ShippingSlips);
-            Assert.Equal(orderItems2, result.Last().Items);
-            Assert.Equal(shippingSlips2, result.Last().ShippingSlips);
+            Assert.Equal(purchaseOrders[0].Items, result.First().Items);
+            Assert.Equal(purchaseOrders[0].ShippingSlips, result.First().ShippingSlips);
+            Assert.Equal(purchaseOrders[1].Items, result.Last().Items);
+            Assert.Equal(purchaseOrders[1].ShippingSlips, result.Last().ShippingSlips);
         }
         [Fact]
         public async Task AddPurchaseOrderAsync_AddsPurchaseOrderWithItemsAndMembership()

@@ -29,21 +29,12 @@ namespace Kata.BusinessLogic.Services
 
         public async Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int purchaseOrderId)
         {
-            var purchaseOrder = await _purchaseOrderRepository.GetPurchaseOrderWithItemsAndSlipByIdAsync(purchaseOrderId);
-
-            //if (purchaseOrder != null)
-            //{
-            //    purchaseOrder.Items = (await _orderItemRepository.GetOrderItemsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
-            //    purchaseOrder.ShippingSlips = (await _shippingSlipService.GetShippingSlipsByPurchaseOrderIdAsync(purchaseOrderId)).ToList();
-            //}
-
-            return purchaseOrder;
+            return await _purchaseOrderRepository.GetPurchaseOrderWithItemsAndSlipByIdAsync(purchaseOrderId);
         }
 
         public async Task<IEnumerable<PurchaseOrder>> GetAllPurchaseOrdersAsync()
         {
-            var purchaseOrders = await _purchaseOrderRepository.GetAllPurchaseOrdersWithItemsAndSlipsAsync();
-            return purchaseOrders;
+            return await _purchaseOrderRepository.GetAllPurchaseOrdersWithItemsAndSlipsAsync();
         }
 
         public async Task AddPurchaseOrderAsync(PurchaseOrder purchaseOrder)
